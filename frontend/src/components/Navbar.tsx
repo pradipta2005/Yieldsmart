@@ -1,0 +1,134 @@
+"use client";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getUser, clearAuth } from "@/lib/auth";
+import { Leaf, LayoutDashboard, ScanLine, History, LogOut, MapPin, ChevronDown, Sun, Moon } from "lucide-react";
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ name: string; city: string; initials?: string } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    setUser(getUser());
+    
+    // Theme initialization
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.body.classList.add("light-theme");
+      } else {
+        document.body.classList.remove("light-theme");
+      }
+    } else {
+      // Default is dark
+      localStorage.setItem("theme", "dark");
+      document.body.classList.remove("light-theme");
+    }
+
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "light") {
+      document.body.classList.add("light-theme");
+    } else {
+      document.body.classList.remove("light-theme");
+    }
+  };
+
+  const handleLogout = () => { clearAuth(); router.push("/"); };
+
+  const navLinks = [
+    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
+    { href: "/disease",   label: "Scanner",   icon: <ScanLine size={16} /> },
+    { href: "/history",   label: "History",   icon: <History size={16} /> },
+  ];
+
+  const initials = user?.initials ||
+    (user?.name ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "?");
+
+  return (
+    <nav className={`navbar-comp ${scrolled ? "scrolled" : ""}`}>
+      {/* Brand */}
+      <Link href="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="brand-logo-container">
+          <Leaf size={15} color="var(--accent-primary)" />
+        </div>
+        <span className="brand-text">
+          YieldSmart
+        </span>
+      </Link>
+
+      {/* Nav links */}
+      <div className="navbar-links-container">
+        {navLinks.map(l => {
+          const active = pathname === l.href;
+          return (
+            <Link key={l.href} href={l.href} className={`navbar-item-link ${active ? "active" : ""}`}>
+              {l.icon} 
+              <span className="nav-text-label">{l.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Right side controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {user?.city && (
+          <span className="user-city-badge">
+            <MapPin size={12} /> <span className="city-text">{user.city}</span>
+          </span>
+        )}
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn"
+          aria-label="Toggle theme"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
+
+        {/* User drop down menu */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setMenuOpen(p => !p)}
+            className="user-profile-btn"
+          >
+            <div className="user-avatar-initials">
+              {initials}
+            </div>
+            <ChevronDown size={12} className={`chevron-indicator ${menuOpen ? "open" : ""}`} />
+          </button>
+
+          {menuOpen && (
+            <div className="navbar-dropdown-panel" onClick={() => setMenuOpen(false)}>
+              <div className="dropdown-user-info">
+                <div className="user-display-name">{user?.name}</div>
+                <div className="user-display-city">{user?.city}</div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="dropdown-signout-btn"
+              >
+                <LogOut size={14} /> Sign Out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
