@@ -27,15 +27,49 @@ def get_labels():
         _class_labels = data
     return _class_labels
 
+def check_and_download_model():
+    """Download the keras model from GitHub Releases if it does not exist locally."""
+    if not os.path.exists(MODEL_PATH):
+        print(f"Model file not found at {MODEL_PATH}.")
+        print("Downloading plant_disease_recog_model.keras from GitHub Releases (770MB)...")
+        url = "https://github.com/pradipta2005/Yieldsmart/releases/download/model/plant_disease_recog_model.keras"
+        try:
+            import requests
+            response = requests.get(url, stream=True, timeout=60)
+            response.raise_for_status()
+            
+            temp_path = MODEL_PATH + ".tmp"
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded = 0
+            
+            with open(temp_path, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        
+            os.replace(temp_path, MODEL_PATH)
+            print("Download complete. Model saved successfully.")
+        except Exception as e:
+            if os.path.exists(MODEL_PATH + ".tmp"):
+                os.remove(MODEL_PATH + ".tmp")
+            raise FileNotFoundError(
+                f"Model file not found at {MODEL_PATH} and auto-download failed: {e}. "
+                "Please create a GitHub release tagged 'model' and upload the model file, "
+                "or place the model file manually in the project root directory."
+            )
+
 def get_model():
     global _model
     with _model_lock:
         if _model is None:
+            check_and_download_model()
             import tensorflow as tf
             print("Loading Keras model... (this may take a moment)")
             _model = tf.keras.models.load_model(MODEL_PATH)
             print("Model loaded successfully.")
         return _model
+
 
 # Number of valid plant disease classes
 NUM_CLASSES = 38
