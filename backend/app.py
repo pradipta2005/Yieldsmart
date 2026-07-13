@@ -24,3 +24,8 @@ with gr.Blocks(title="YieldSmart API", css="footer {visibility: hidden}") as dem
 
 # Mount the Gradio web UI onto the FastAPI application at the root route
 app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7860)
+
