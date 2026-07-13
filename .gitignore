@@ -23,3 +23,7 @@ build/
 
 # Temp directories
 tmp*/
+
+# Local deployment helpers
+backend/spaces.py
+
