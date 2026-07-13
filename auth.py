@@ -12,7 +12,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from database import get_db
 
-SECRET_KEY = os.getenv("JWT_SECRET", "yieldsmart-ultra-secret-2025-change-in-prod")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("JWT_SECRET", "yieldsmart-ultra-secret-2025-change-in-prod"))
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 
