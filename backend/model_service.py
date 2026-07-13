@@ -53,7 +53,8 @@ def check_and_download_model():
             downloaded_path = hf_hub_download(
                 repo_id="pradipta2005/yieldsmart-api",
                 repo_type="space",
-                filename="plant_disease_recog_model.keras"
+                filename="plant_disease_recog_model.keras",
+                token=os.environ.get("HF_TOKEN")
             )
             RESOLVED_MODEL_PATH = downloaded_path
             print("Model resolved successfully via HF Hub:", RESOLVED_MODEL_PATH)
