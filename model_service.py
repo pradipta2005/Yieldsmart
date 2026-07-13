@@ -13,7 +13,12 @@ _model = None
 _class_labels = None
 _model_lock = threading.Lock()
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "plant_disease_recog_model.keras")
+# Look for model in same directory first (Hugging Face or moved), fallback to parent directory
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model.keras")
+if not os.path.exists(MODEL_PATH):
+    parent_path = os.path.join(os.path.dirname(__file__), "..", "plant_disease_recog_model.keras")
+    if os.path.exists(parent_path):
+        MODEL_PATH = parent_path
 
 # TF 2.13 compatibility: suppress noisy warnings
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
