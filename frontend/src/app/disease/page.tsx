@@ -25,7 +25,7 @@ function ProgressBar({ value, color = "var(--success)" }: { value: number; color
   const [w, setW] = useState(0);
   useEffect(() => { const t = setTimeout(() => setW(value), 300); return () => clearTimeout(t); }, [value]);
   return (
-    <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+    <div style={{ height: 2, background: "rgba(255,255,255,0.05)", borderRadius: 99, overflow: "hidden" }}>
       <div style={{ height: "100%", width: `${w}%`, background: color, borderRadius: 99, transition: "width 0.9s cubic-bezier(0.16,1,0.3,1)" }} />
     </div>
   );
@@ -205,11 +205,11 @@ export default function DiseasePage() {
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
                       <span style={{
                         fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-                        padding: "4px 12px", borderRadius: 99,
-                        background: sevColor + "18", color: sevColor, border: `1px solid ${sevColor}30`,
+                        padding: "4px 12px", borderRadius: 4,
+                        background: sevColor + "12", color: sevColor, border: `1px solid ${sevColor}25`,
                       }}>{SEV_LABEL[sev]}</span>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: "2.5rem", fontWeight: 800, color: sevColor, lineHeight: 1, fontFamily: "var(--font-display)" }}>{result.confidence}%</div>
+                        <div style={{ fontSize: "2.25rem", fontWeight: 600, color: sevColor, lineHeight: 1, fontFamily: "var(--font-mono)" }}>{result.confidence}%</div>
                         <div style={{ fontSize: "0.68rem", color: "var(--text-tertiary)", marginTop: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Confidence</div>
                       </div>
                     </div>
@@ -262,11 +262,11 @@ export default function DiseasePage() {
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             {result.disease_info.treatments.map((t, i) => (
-                              <div key={i} style={{ padding: "14px 16px", background: "var(--bg-tertiary)", borderRadius: 12, border: "1px solid var(--border-subtle)" }}>
+                              <div key={i} style={{ padding: "12px 14px", background: "transparent", borderLeft: `2px solid ${sevColor}`, borderTop: "1px solid var(--border-subtle)", borderRight: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)", borderRadius: 8 }}>
                                 <div style={{ fontWeight: 600, fontSize: "0.875rem", marginBottom: 6, color: "var(--text-primary)" }}>{t.method}</div>
-                                <div style={{ display: "flex", gap: 16, fontSize: "0.78rem", color: "var(--text-tertiary)" }}>
-                                  {t.ratio && <span>Ratio: {t.ratio}</span>}
-                                  {t.frequency && <span>Freq: {t.frequency}</span>}
+                                <div style={{ display: "flex", gap: 16, fontSize: "0.75rem", fontFamily: "var(--font-mono)", color: "var(--text-tertiary)" }}>
+                                  {t.ratio && <span>RATIO: {t.ratio}</span>}
+                                  {t.frequency && <span>FREQ: {t.frequency}</span>}
                                 </div>
                               </div>
                             ))}
@@ -279,11 +279,11 @@ export default function DiseasePage() {
                           <div style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-tertiary)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                             <Shield size={13} /> Prevention Tips
                           </div>
-                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             {result.disease_info.prevention.map((p, i) => (
-                              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                                <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--accent-primary)", marginTop: 7, flexShrink: 0, opacity: 0.7 }} />
-                                {p}
+                              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--accent-primary)", marginTop: 2 }}>{`[${(i + 1).toString().padStart(2, "0")}]`}</span>
+                                <span>{p}</span>
                               </div>
                             ))}
                           </div>
@@ -301,11 +301,11 @@ export default function DiseasePage() {
                       const pct = Math.round(p.confidence * 100);
                       return (
                         <div key={p.label} style={{ marginBottom: 14 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                             <span style={{ fontSize: "0.82rem", color: i === 0 ? "var(--text-primary)" : "var(--text-secondary)" }}>
                               {p.label.replace(/___/g, " — ").replace(/_/g, " ")}
                             </span>
-                            <span style={{ fontSize: "0.82rem", fontWeight: 700, color: i === 0 ? sevColor : "var(--text-tertiary)" }}>{pct}%</span>
+                            <span style={{ fontSize: "0.82rem", fontWeight: 600, fontFamily: "var(--font-mono)", color: i === 0 ? sevColor : "var(--text-tertiary)" }}>{pct}%</span>
                           </div>
                           <ProgressBar value={pct} color={i === 0 ? sevColor : "var(--border-subtle)"} />
                         </div>
@@ -325,3 +325,4 @@ export default function DiseasePage() {
     </>
   );
 }
+

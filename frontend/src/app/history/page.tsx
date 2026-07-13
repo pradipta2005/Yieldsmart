@@ -70,7 +70,7 @@ export default function HistoryPage() {
             ].map((s, i) => (
               <div key={i} className="app-card" style={{ background: s.bg, borderColor: s.border }}>
                 <div style={{ color: s.color, marginBottom: 16, opacity: 0.7 }}>{s.icon}</div>
-                <div style={{ fontSize: "2.25rem", fontWeight: 800, color: s.color, lineHeight: 1, fontFamily: "var(--font-display)", marginBottom: 6 }}>{s.val}</div>
+                <div style={{ fontSize: "2rem", fontWeight: 600, color: s.color, lineHeight: 1, fontFamily: "var(--font-mono)", marginBottom: 6 }}>{s.val}</div>
                 <div style={{ fontSize: "0.78rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-tertiary)" }}>{s.label}</div>
               </div>
             ))}
@@ -134,15 +134,15 @@ export default function HistoryPage() {
 
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
                         <span style={{
-                          fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-                          padding: "3px 10px", borderRadius: 99,
+                          fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em",
+                          padding: "3px 8px", borderRadius: 4,
                           background: (SEV_BG[sev] || "var(--bg-tertiary)"),
                           color: (SEV_COLOR[sev] || "var(--text-secondary)"),
                           border: `1px solid ${SEV_BORDER[sev] || "var(--border-subtle)"}`,
                         }}>
                           {SEV_LABEL[sev] || sev}
                         </span>
-                        <div style={{ fontSize: "0.75rem", color: "var(--text-tertiary)" }}>{formatDate(item.scanned_at)}</div>
+                        <div style={{ fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--text-tertiary)" }}>{formatDate(item.scanned_at)}</div>
                       </div>
                     </div>
                   );
@@ -208,10 +208,10 @@ export default function HistoryPage() {
                 <div style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>Plant: {info?.plant || selectedScan.plant}</div>
 
                 <div style={{ position: "absolute", bottom: 24, right: 28, textAlign: "right" }}>
-                  <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", padding: "3px 10px", borderRadius: 99, background: sevColor + "18", color: sevColor, border: `1px solid ${sevColor}30`, marginBottom: 8, display: "inline-block" }}>
+                  <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", padding: "3px 8px", borderRadius: 4, background: sevColor + "12", color: sevColor, border: `1px solid ${sevColor}25`, marginBottom: 8, display: "inline-block" }}>
                     {SEV_LABEL[sev]}
                   </div>
-                  <div style={{ fontSize: "2rem", fontWeight: 800, color: sevColor, lineHeight: 1, fontFamily: "var(--font-display)" }}>{selectedScan.confidence}%</div>
+                  <div style={{ fontSize: "2rem", fontWeight: 600, color: sevColor, lineHeight: 1, fontFamily: "var(--font-mono)" }}>{selectedScan.confidence}%</div>
                   <div style={{ fontSize: "0.65rem", color: "var(--text-tertiary)", marginTop: 3, textTransform: "uppercase", letterSpacing: "0.06em" }}>Confidence</div>
                 </div>
               </div>
@@ -230,8 +230,8 @@ export default function HistoryPage() {
                     </div>
 
                     {info.organic && (
-                      <div style={{ display: "inline-flex", alignSelf: "flex-start", padding: "6px 14px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 99, color: "var(--success)", fontSize: "0.78rem", fontWeight: 600 }}>
-                        🌱 Organic Treatment Available
+                      <div style={{ display: "inline-flex", alignSelf: "flex-start", padding: "4px 10px", background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 4, color: "var(--success)", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.02em" }}>
+                        ORGANIC SPECIFICATION AVAILABLE
                       </div>
                     )}
 
@@ -242,11 +242,11 @@ export default function HistoryPage() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                           {info.treatments.map((t, idx) => (
-                            <div key={idx} style={{ padding: "12px 14px", background: "var(--bg-tertiary)", borderRadius: 10, border: "1px solid var(--border-subtle)" }}>
+                            <div key={idx} style={{ padding: "12px 14px", background: "transparent", borderLeft: `2px solid ${sevColor}`, borderTop: "1px solid var(--border-subtle)", borderRight: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)", borderRadius: 8 }}>
                               <div style={{ fontWeight: 600, fontSize: "0.875rem", marginBottom: 5, color: "var(--text-primary)" }}>{t.method}</div>
-                              <div style={{ display: "flex", gap: 14, fontSize: "0.78rem", color: "var(--text-tertiary)" }}>
-                                {t.ratio && <span>Ratio: {t.ratio}</span>}
-                                {t.frequency && <span>Freq: {t.frequency}</span>}
+                              <div style={{ display: "flex", gap: 14, fontSize: "0.75rem", fontFamily: "var(--font-mono)", color: "var(--text-tertiary)" }}>
+                                {t.ratio && <span>RATIO: {t.ratio}</span>}
+                                {t.frequency && <span>FREQ: {t.frequency}</span>}
                               </div>
                             </div>
                           ))}
@@ -259,11 +259,11 @@ export default function HistoryPage() {
                         <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-tertiary)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
                           <Shield size={12} /> Prevention Tips
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                           {info.prevention.map((p, i) => (
-                            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--accent-primary)", marginTop: 7, flexShrink: 0, opacity: 0.7 }} />
-                              {p}
+                            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--accent-primary)", marginTop: 2 }}>{`[${(i + 1).toString().padStart(2, "0")}]`}</span>
+                              <span>{p}</span>
                             </div>
                           ))}
                         </div>

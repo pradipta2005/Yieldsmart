@@ -8,6 +8,7 @@ import {
   Cloud, Droplets, Wind, Eye, Thermometer, Sunrise, Sunset,
   Leaf, AlertTriangle, Droplet, Clock, CheckCircle2, XCircle,
   RefreshCw, ArrowRight, Zap, TrendingUp, Info,
+  Sun, CloudSnow, CloudLightning, CloudDrizzle, CloudFog, CloudRain
 } from "lucide-react";
 
 /* ─── Animated number counter ─────────────────────────────── */
@@ -79,6 +80,18 @@ function Tag({ label, color = "var(--accent-primary)" }: { label: string; color?
 
 /* ─── Divider ──────────────────────────────────────────────── */
 const Div = () => <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "16px 0" }} />;
+
+/* ─── Weather Icon Helper ─────────────────────────────────── */
+function getWeatherIcon(desc: string, size: number = 24) {
+  const d = desc.toLowerCase();
+  if (d.includes("rain") || d.includes("drizzle") || d.includes("shower")) return <CloudRain size={size} style={{ strokeWidth: 1.25 }} />;
+  if (d.includes("thunderstorm") || d.includes("storm")) return <CloudLightning size={size} style={{ strokeWidth: 1.25 }} />;
+  if (d.includes("snow") || d.includes("ice") || d.includes("freeze")) return <CloudSnow size={size} style={{ strokeWidth: 1.25 }} />;
+  if (d.includes("clear") || d.includes("sunny") || d.includes("sun")) return <Sun size={size} style={{ strokeWidth: 1.25 }} />;
+  if (d.includes("fog") || d.includes("mist") || d.includes("haze")) return <CloudFog size={size} style={{ strokeWidth: 1.25 }} />;
+  return <Cloud size={size} style={{ strokeWidth: 1.25 }} />;
+}
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -194,22 +207,20 @@ export default function DashboardPage() {
               {/* ══ ROW 0 — KPI STRIP ══════════════════════════════════ */}
               <div className="dashboard-kpi-grid">
                 {[
-                  { emoji: "🌡️", label: "Temperature", value: data.weather.temp, suffix: "°C", sub: data.weather.description, color: "#60A5FA" },
-                  { emoji: "💧", label: "Humidity", value: data.weather.humidity, suffix: "%", sub: "Relative humidity", color: "#34D399" },
-                  { emoji: "💨", label: "Wind Speed", value: data.weather.wind_speed, suffix: " km/h", sub: windDir(data.weather.wind_deg), color: "#A78BFA" },
-                  { emoji: "🌱", label: "Soil Moisture", value: data.soil.moisture_pct, suffix: "%", sub: data.soil.moisture_level, color: "#FBBF24" },
+                  { icon: <Thermometer size={14} />, label: "Temperature", value: data.weather.temp, suffix: "°C", sub: data.weather.description, color: "#60A5FA" },
+                  { icon: <Droplets size={14} />, label: "Humidity", value: data.weather.humidity, suffix: "%", sub: "Relative humidity", color: "#34D399" },
+                  { icon: <Wind size={14} />, label: "Wind Speed", value: data.weather.wind_speed, suffix: " km/h", sub: windDir(data.weather.wind_deg), color: "#A78BFA" },
+                  { icon: <Droplet size={14} />, label: "Soil Moisture", value: data.soil.moisture_pct, suffix: "%", sub: data.soil.moisture_level, color: "#FBBF24" },
                 ].map((kpi, i) => (
-                  <div key={i} className="kpi-card">
-                    {/* Subtle corner glow */}
-                    <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, borderRadius: "50%", background: `radial-gradient(circle at top right, ${kpi.color}14, transparent 70%)`, pointerEvents: "none" }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
-                      <span style={{ fontSize: "1.6rem", lineHeight: 1 }}>{kpi.emoji}</span>
-                      <span style={{ fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-tertiary)" }}>{kpi.label}</span>
+                  <div key={i} className="kpi-card" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-subtle)", borderRadius: 18, padding: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <span style={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-tertiary)" }}>{kpi.label}</span>
+                      <div style={{ color: kpi.color, display: "flex", alignItems: "center", opacity: 0.8 }}>{kpi.icon}</div>
                     </div>
-                    <div style={{ fontSize: "2.1rem", fontWeight: 800, letterSpacing: "-0.04em", fontFamily: "var(--font-display)", color: kpi.color, lineHeight: 1, marginBottom: 8 }}>
+                    <div style={{ fontSize: "1.85rem", fontWeight: 600, letterSpacing: "-0.02em", fontFamily: "var(--font-mono)", color: kpi.color, lineHeight: 1, marginBottom: 8 }}>
                       <CountUp to={kpi.value} suffix={kpi.suffix} />
                     </div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", textTransform: "capitalize", fontWeight: 500 }}>{kpi.sub}</div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", textTransform: "capitalize", fontWeight: 500 }}>{kpi.sub}</div>
                   </div>
                 ))}
               </div>
@@ -234,38 +245,39 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Main temp display */}
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 28, marginBottom: 32, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 28, marginBottom: 32, flexWrap: "wrap" }}>
                     <div>
-                      <div style={{ fontSize: "clamp(3.5rem, 8vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 1, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+                      <div style={{ fontSize: "clamp(3rem, 8vw, 4.75rem)", fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1, fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
                         {data.weather.temp}
-                        <span style={{ fontSize: "2.5rem", color: "var(--text-tertiary)", fontWeight: 400 }}>°C</span>
+                        <span style={{ fontSize: "2rem", color: "var(--text-tertiary)", fontWeight: 400 }}>°C</span>
                       </div>
-                      <div style={{ fontSize: "1.1rem", color: "var(--text-secondary)", marginTop: 10, textTransform: "capitalize", fontWeight: 500 }}>{data.weather.description}</div>
-                      <div style={{ fontSize: "0.82rem", color: "var(--text-tertiary)", marginTop: 5 }}>
+                      <div style={{ fontSize: "1.1rem", fontFamily: "var(--font-display)", fontStyle: "italic", color: "var(--text-secondary)", marginTop: 10, textTransform: "capitalize", fontWeight: 400 }}>
+                        {data.weather.description}
+                      </div>
+                      <div style={{ fontSize: "0.82rem", fontFamily: "var(--font-mono)", color: "var(--text-tertiary)", marginTop: 6 }}>
                         High {data.weather.temp_max}° · Low {data.weather.temp_min}°
                       </div>
                     </div>
-                    <div style={{ fontSize: "6rem", lineHeight: 1, marginBottom: 8, filter: "drop-shadow(0 0 20px rgba(255,255,255,0.1))" }}>
-                      {data.weather.icon_emoji}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 88, height: 88, borderRadius: "50%", background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.12)", color: "#60A5FA" }}>
+                      {getWeatherIcon(data.weather.description, 40)}
                     </div>
                   </div>
 
                   <Div />
 
                   {/* Detail grid */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 16 }}>
                     {[
-                      { icon: <Droplets size={14} />, lbl: "Humidity", val: `${data.weather.humidity}%`, color: "#34D399" },
-                      { icon: <Wind size={14} />, lbl: "Wind", val: `${data.weather.wind_speed} km/h ${windDir(data.weather.wind_deg)}`, color: "#A78BFA" },
-                      { icon: <Eye size={14} />, lbl: "Visibility", val: `${data.weather.visibility} km`, color: "#60A5FA" },
-                      { icon: <Thermometer size={14} />, lbl: "Pressure", val: `${data.weather.pressure} hPa`, color: "#FB923C" },
-                      { icon: <Sunrise size={14} />, lbl: "Sunrise", val: data.weather.sunrise, color: "#FBBF24" },
-                      { icon: <Sunset size={14} />, lbl: "Sunset", val: data.weather.sunset, color: "#F472B6" },
+                      { icon: <Droplets size={13} />, lbl: "Humidity", val: `${data.weather.humidity}%`, color: "#34D399" },
+                      { icon: <Wind size={13} />, lbl: "Wind Speed", val: `${data.weather.wind_speed} km/h`, color: "#A78BFA" },
+                      { icon: <Eye size={13} />, lbl: "Visibility", val: `${data.weather.visibility} km`, color: "#60A5FA" },
+                      { icon: <Thermometer size={13} />, lbl: "Pressure", val: `${data.weather.pressure} hPa`, color: "#FB923C" },
+                      { icon: <Sunrise size={13} />, lbl: "Sunrise", val: data.weather.sunrise, color: "#FBBF24" },
+                      { icon: <Sunset size={13} />, lbl: "Sunset", val: data.weather.sunset, color: "#F472B6" },
                     ].map(m => (
-                      <div key={m.lbl} style={{ padding: "14px", background: "var(--bg-tertiary)", borderRadius: 14, border: "1px solid var(--border-subtle)", transition: "background 0.2s" }}>
-                        <div style={{ color: m.color, marginBottom: 8, opacity: 0.8 }}>{m.icon}</div>
-                        <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 3 }}>{m.val}</div>
-                        <div style={{ fontSize: "0.68rem", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>{m.lbl}</div>
+                      <div key={m.lbl} style={{ padding: "8px 0 8px 12px", borderLeft: `1px solid ${m.color}50` }}>
+                        <div style={{ fontSize: "0.65rem", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600, marginBottom: 3 }}>{m.lbl}</div>
+                        <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)", fontFamily: "var(--font-mono)" }}>{m.val}</div>
                       </div>
                     ))}
                   </div>
@@ -290,19 +302,19 @@ export default function DashboardPage() {
                     },
                     { label: "Nitrogen", value: data.soil.nitrogen, pct: data.soil.nitrogen_pct, color: "#60A5FA" },
                   ].map(s => (
-                    <div key={s.label} style={{ marginBottom: 22 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 600 }}>{s.label}</span>
+                    <div key={s.label} style={{ marginBottom: 20 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 500 }}>{s.label}</span>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--text-primary)" }}>{s.value}</span>
+                          <span style={{ fontWeight: 600, fontSize: "0.875rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>{s.value}</span>
                           {s.badge && (
-                            <span style={{ fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em", padding: "2px 8px", borderRadius: 99, background: s.color + "18", color: s.color, border: `1px solid ${s.color}30` }}>
+                            <span style={{ fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 4, background: s.color + "12", color: s.color, border: `1px solid ${s.color}25` }}>
                               {s.badge}
                             </span>
                           )}
                         </div>
                       </div>
-                      <Bar value={s.pct} color={s.color} height={5} />
+                      <Bar value={s.pct} color={s.color} height={2} />
                     </div>
                   ))}
 
@@ -310,20 +322,20 @@ export default function DashboardPage() {
 
                   {/* Soil parameters */}
                   {[
-                    { label: "Soil Temperature", value: `${data.soil.soil_temp}°C`, icon: "🌡️" },
-                    { label: "pH Level", value: data.soil.ph_label, icon: "⚗️" },
+                    { label: "Soil Temperature", value: `${data.soil.soil_temp}°C`, icon: <Thermometer size={12} /> },
+                    { label: "pH Level", value: data.soil.ph_label, icon: <Info size={12} /> },
                   ].map(m => (
                     <div key={m.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--border-subtle)" }}>
-                      <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: 7 }}>
-                        <span>{m.icon}</span> {m.label}
+                      <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ opacity: 0.6 }}>{m.icon}</span> {m.label}
                       </span>
-                      <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)" }}>{m.value}</span>
+                      <span style={{ fontWeight: 600, fontSize: "0.875rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>{m.value}</span>
                     </div>
                   ))}
 
-                  <div style={{ padding: "12px 14px", background: "var(--success-bg)", borderRadius: 12, border: "1px solid rgba(16,185,129,0.1)", fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", gap: 8, alignItems: "flex-start", marginTop: "auto" }}>
-                    <Info size={13} style={{ flexShrink: 0, marginTop: 2, color: "var(--accent-primary)", opacity: 0.6 }} />
-                    {data.soil.note}
+                  <div style={{ padding: "10px 12px 10px 14px", borderLeft: "2px solid var(--accent-primary)", fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.55, display: "flex", gap: 8, alignItems: "flex-start", marginTop: "auto" }}>
+                    <Info size={13} style={{ flexShrink: 0, marginTop: 2, color: "var(--accent-primary)", opacity: 0.8 }} />
+                    <p style={{ fontStyle: "italic", fontFamily: "var(--font-sans)" }}>{data.soil.note}</p>
                   </div>
                 </div>
               </div>
@@ -338,8 +350,8 @@ export default function DashboardPage() {
                       <Tag label="Farm Alerts" color={data.alerts.some(a => a.type === "danger") ? "var(--danger)" : data.alerts.some(a => a.type === "warning") ? "var(--warning)" : "var(--success)"} />
                       <div style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>Active Alerts</div>
                     </div>
-                    <div style={{ fontSize: "2rem", fontWeight: 900, fontFamily: "var(--font-display)", color: data.alerts.length === 0 ? "var(--success)" : "var(--warning)" }}>
-                      {data.alerts.length}
+                    <div style={{ fontSize: "1.75rem", fontWeight: 600, fontFamily: "var(--font-mono)", color: data.alerts.length === 0 ? "var(--success)" : "var(--warning)" }}>
+                      {data.alerts.length.toString().padStart(2, "0")}
                     </div>
                   </div>
 
@@ -348,14 +360,13 @@ export default function DashboardPage() {
                       {data.alerts.map((a, i) => {
                         const c = a.type === "danger" ? "var(--danger)" : "var(--warning)";
                         return (
-                          <div key={i} style={{ display: "flex", gap: 14, padding: "16px 18px", borderRadius: 14, background: c + "08", border: `1px solid ${c}20` }}>
-                            <span style={{ fontSize: "1.4rem", flexShrink: 0, lineHeight: 1 }}>{a.icon}</span>
+                          <div key={i} style={{ display: "flex", gap: 14, padding: "14px 16px", borderRadius: 12, background: "transparent", borderLeft: `2px solid ${c}`, borderTop: "1px solid var(--border-subtle)", borderRight: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
                             <div style={{ flex: 1 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
                                 <span style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--text-primary)" }}>{a.title}</span>
                                 <AlertPill type={a.type} />
                               </div>
-                              <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>{a.message}</div>
+                              <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>{a.message}</div>
                             </div>
                           </div>
                         );
@@ -363,12 +374,12 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "28px 0", gap: 14, textAlign: "center" }}>
-                      <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(16,185,129,0.09)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <CheckCircle2 size={24} color="var(--success)" />
+                      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <CheckCircle2 size={22} color="var(--success)" style={{ strokeWidth: 1.5 }} />
                       </div>
                       <div>
                         <div style={{ fontWeight: 700, marginBottom: 4, color: "var(--text-primary)" }}>All clear</div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)", lineHeight: 1.55 }}>Your farm has no active alerts right now.</div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)", lineHeight: 1.5 }}>Your farm has no active alerts right now.</div>
                       </div>
                     </div>
                   )}
@@ -382,24 +393,24 @@ export default function DashboardPage() {
                   <div style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", marginBottom: 22, color: "var(--text-primary)" }}>Irrigation Schedule</div>
 
                   {[
-                    { icon: <Sunrise size={16} color="#FBBF24" />, label: "Morning Window", value: data.irrigation.morning, note: "Ideal pre-evaporation window" },
-                    { icon: <Sunset size={16} color="#F472B6" />, label: "Evening Window", value: data.irrigation.evening, note: "Cooler, lower wind conditions" },
-                    { icon: <Clock size={16} color="#60A5FA" />, label: "Frequency", value: data.irrigation.frequency, note: "Recommended cycle" },
+                    { icon: <Sunrise size={14} color="#FBBF24" />, label: "Morning Window", value: data.irrigation.morning, note: "Ideal pre-evaporation window" },
+                    { icon: <Sunset size={14} color="#F472B6" />, label: "Evening Window", value: data.irrigation.evening, note: "Cooler, lower wind conditions" },
+                    { icon: <Clock size={14} color="#60A5FA" />, label: "Frequency", value: data.irrigation.frequency, note: "Recommended cycle" },
                   ].map((m, i) => (
-                    <div key={i} style={{ padding: "16px", background: "var(--bg-tertiary)", borderRadius: 14, border: "1px solid var(--border-subtle)", marginBottom: 10 }}>
+                    <div key={i} style={{ padding: "12px 14px", background: "transparent", borderBottom: "1px solid var(--border-subtle)", marginBottom: 4 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.82rem", color: "var(--text-secondary)", fontWeight: 500 }}>
                           {m.icon} {m.label}
                         </div>
-                        <span style={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--text-primary)" }}>{m.value}</span>
+                        <span style={{ fontWeight: 600, fontSize: "0.875rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>{m.value}</span>
                       </div>
-                      <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", marginLeft: 24 }}>{m.note}</div>
+                      <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", marginLeft: 22 }}>{m.note}</div>
                     </div>
                   ))}
 
-                  <div style={{ marginTop: 6, padding: "12px 14px", background: "var(--info-bg)", borderRadius: 12, border: "1px solid rgba(59,130,246,0.12)", fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", gap: 8, alignItems: "flex-start" }}>
-                    <Droplet size={13} style={{ flexShrink: 0, marginTop: 2, color: "#60A5FA", opacity: 0.7 }} />
-                    {data.irrigation.reason}
+                  <div style={{ marginTop: 14, padding: "10px 12px 10px 14px", borderLeft: "2px solid #60A5FA", fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.55, display: "flex", gap: 8, alignItems: "flex-start" }}>
+                    <Droplet size={13} style={{ flexShrink: 0, marginTop: 2, color: "#60A5FA", opacity: 0.8 }} />
+                    <p style={{ fontStyle: "italic" }}>{data.irrigation.reason}</p>
                   </div>
                 </div>
               </div>
@@ -418,8 +429,8 @@ export default function DashboardPage() {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <Zap size={14} color="var(--accent-primary)" />
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-tertiary)" }}>
-                      {data.crops.length} crop{data.crops.length !== 1 ? "s" : ""} matched
+                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-tertiary)", fontFamily: "var(--font-mono)" }}>
+                      {data.crops.length.toString().padStart(2, "0")} MATCHED
                     </span>
                   </div>
                 </div>
@@ -431,17 +442,17 @@ export default function DashboardPage() {
                         key={c.name}
                         className="crop-recommendation-card"
                         style={{
-                          padding: "22px", borderRadius: 18,
+                          padding: "24px", borderRadius: 16,
                           border: "1px solid var(--border-subtle)",
-                          background: "var(--bg-tertiary)",
+                          background: "var(--bg-secondary)",
                           transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.25s, box-shadow 0.25s",
                           cursor: "default",
                           position: "relative", overflow: "hidden",
                         }}
                         onMouseOver={e => {
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(-5px)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)";
-                          (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 40px rgba(16,185,129,0.07)";
+                          (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.35)";
+                          (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 30px rgba(0,0,0,0.4)";
                         }}
                         onMouseOut={e => {
                           (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
@@ -451,27 +462,33 @@ export default function DashboardPage() {
                       >
                         {/* Match rank badge for top crop */}
                         {i === 0 && (
-                          <div style={{ position: "absolute", top: 14, right: 14, fontSize: "0.55rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em", padding: "2px 8px", borderRadius: 99, background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.25)" }}>
+                          <div style={{ position: "absolute", top: 16, right: 16, fontSize: "0.55rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em", padding: "2px 8px", borderRadius: 4, background: "rgba(212,175,55,0.08)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}>
                             Top Pick
                           </div>
                         )}
 
-                        <div style={{ fontSize: "2.5rem", lineHeight: 1, marginBottom: 16 }}>{c.emoji}</div>
-
-                        <div style={{ fontWeight: 800, fontSize: "1.05rem", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4, color: "var(--text-primary)" }}>{c.name}</div>
-                        <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", marginBottom: 16, fontWeight: 500 }}>{c.soil_type}</div>
-
-                        {/* Score bar */}
-                        <div style={{ marginBottom: 10 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-                            <span style={{ fontSize: "0.68rem", color: "var(--text-tertiary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Match</span>
-                            <span style={{ fontWeight: 900, fontSize: "0.95rem", color: sev(c.score), fontFamily: "var(--font-display)" }}>{c.score}%</span>
+                        <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 20 }}>
+                          <div style={{
+                            width: 44, height: 44, borderRadius: "50%",
+                            background: "var(--bg-tertiary)", border: "1px solid var(--border-subtle)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: "1.5rem", lineHeight: 1
+                          }}>
+                            {c.emoji}
                           </div>
-                          <Bar value={c.score} color={sev(c.score)} height={4} />
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: "1.1rem", fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>{c.name}</div>
+                            <div style={{ fontSize: "0.7rem", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 1 }}>{c.soil_type}</div>
+                          </div>
                         </div>
 
-                        <Div />
-                        <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>{c.tip}</div>
+                        {/* Monospace Tech Match indicator */}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-tertiary)", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-subtle)", marginBottom: 18 }}>
+                          <span style={{ fontSize: "0.65rem", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>MATCH INDEX</span>
+                          <span style={{ fontWeight: 600, fontSize: "0.85rem", color: sev(c.score), fontFamily: "var(--font-mono)" }}>//{c.score}.00%</span>
+                        </div>
+
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{c.tip}&rdquo;</div>
                       </div>
                     ))}
                   </div>
@@ -485,6 +502,7 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
+
 
               {/* ══ ROW 4 — QUICK ACTIONS STRIP ════════════════════════ */}
               <div className="dashboard-two-col-grid">
