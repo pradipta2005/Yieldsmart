@@ -14,10 +14,10 @@ def custom_create_app(*args, **kwargs):
     # Include the routes from our FastAPI backend app directly
     app.include_router(fastapi_app.router)
     # Prioritize any routes starting with "/api_v2" by moving them to the top
-    if app.routes:
-        api_routes = [r for r in app.routes if getattr(r, "path", "").startswith("/api_v2")]
-        non_api_routes = [r for r in app.routes if not getattr(r, "path", "").startswith("/api_v2")]
-        app.routes = api_routes + non_api_routes
+    if app.router.routes:
+        api_routes = [r for r in app.router.routes if getattr(r, "path", "").startswith("/api_v2")]
+        non_api_routes = [r for r in app.router.routes if not getattr(r, "path", "").startswith("/api_v2")]
+        app.router.routes = api_routes + non_api_routes
     return app
 
 App.create_app = custom_create_app
