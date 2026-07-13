@@ -1,14 +1,11 @@
 import gradio as gr
 from main import app as fastapi_app
 
-# Dummy ZeroGPU trigger to satisfy Hugging Face Space verification
-try:
-    import spaces
-    @spaces.GPU
-    def dummy_gpu_trigger():
-        return "ZeroGPU Active"
-except ImportError:
-    pass
+import spaces
+
+@spaces.GPU
+def dummy_gpu_trigger():
+    return "ZeroGPU Active"
 
 # Define a clean, minimal status dashboard for your Hugging Face space
 with gr.Blocks(title="YieldSmart API", css="footer {visibility: hidden}") as demo:
