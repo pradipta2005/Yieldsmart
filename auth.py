@@ -57,7 +57,7 @@ def create_user(name: str, email: str, password: str, city: str) -> dict:
         if "UNIQUE constraint" in str(e):
             raise HTTPException(status_code=400, detail="An account with this email already exists.")
         print(f"[create_user ERROR] {type(e).__name__}: {e}")
-        raise HTTPException(status_code=500, detail=f"Could not create account: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=500, detail="Could not create account. Please try again.")
     finally:
         conn.close()
 
