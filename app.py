@@ -11,12 +11,13 @@ original_create_app = App.create_app
 def custom_create_app(*args, **kwargs):
     # Build the standard Gradio FastAPI app
     app = original_create_app(*args, **kwargs)
-    # Mount our FastAPI backend app on the /api prefix
-    app.mount("/api", fastapi_app)
-    # Prioritize our /api route by moving it to the top of the routes list
+    # Include the routes from our FastAPI backend app directly
+    app.include_router(fastapi_app.router)
+    # Prioritize any routes starting with "/api" by moving them to the top
     if app.routes:
-        api_route = app.routes.pop()
-        app.routes.insert(0, api_route)
+        api_routes = [r for r in app.routes if getattr(r, "path", "").startswith("/api")]
+        non_api_routes = [r for r in app.routes if not getattr(r, "path", "").startswith("/api")]
+        app.routes = api_routes + non_api_routes
     return app
 
 App.create_app = custom_create_app
