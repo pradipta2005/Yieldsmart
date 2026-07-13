@@ -13,10 +13,10 @@ def custom_create_app(*args, **kwargs):
     app = original_create_app(*args, **kwargs)
     # Include the routes from our FastAPI backend app directly
     app.include_router(fastapi_app.router)
-    # Prioritize any routes starting with "/api" by moving them to the top
+    # Prioritize any routes starting with "/api_v2" by moving them to the top
     if app.routes:
-        api_routes = [r for r in app.routes if getattr(r, "path", "").startswith("/api")]
-        non_api_routes = [r for r in app.routes if not getattr(r, "path", "").startswith("/api")]
+        api_routes = [r for r in app.routes if getattr(r, "path", "").startswith("/api_v2")]
+        non_api_routes = [r for r in app.routes if not getattr(r, "path", "").startswith("/api_v2")]
         app.routes = api_routes + non_api_routes
     return app
 
@@ -35,9 +35,9 @@ with gr.Blocks(title="YieldSmart API", css="footer {visibility: hidden}") as dem
     with gr.Row():
         gr.Markdown("""
         ### 🚀 Live API Endpoints:
-        - **API Health Check**: [/api/health](/api/health)
-        - **Live Dashboard**: [/api/dashboard?city=Kolkata](/api/dashboard?city=Kolkata)
-        - **Scan History**: [/api/history](/api/history)
+        - **API Health Check**: [/api_v2/health](/api_v2/health)
+        - **Live Dashboard**: [/api_v2/dashboard?city=Kolkata](/api_v2/dashboard?city=Kolkata)
+        - **Scan History**: [/api_v2/history](/api_v2/history)
         
         ### ⚙️ System Status:
         - **Host Platform**: Hugging Face Spaces (Gradio Python SDK)
