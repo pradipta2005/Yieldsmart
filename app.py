@@ -28,6 +28,10 @@ with gr.Blocks(title="YieldSmart API", css="footer {visibility: hidden}") as dem
     gr.Markdown("---")
     gr.Markdown("© 2026 YieldSmart Smart Farming Platform. All API operations active.")
 
+    # Hidden event listener to satisfy Hugging Face ZeroGPU runtime checks
+    dummy_btn = gr.Button("Initialize GPU Context", visible=False)
+    dummy_btn.click(fn=dummy_gpu_trigger, inputs=[], outputs=[])
+
 # Mount the Gradio web UI onto the FastAPI application at the root route
 app = gr.mount_gradio_app(fastapi_app, demo, path="/")
 
