@@ -13,6 +13,10 @@ def custom_create_app(*args, **kwargs):
     app = original_create_app(*args, **kwargs)
     # Mount our FastAPI backend app on the /api prefix
     app.mount("/api", fastapi_app)
+    # Prioritize our /api route by moving it to the top of the routes list
+    if app.routes:
+        api_route = app.routes.pop()
+        app.routes.insert(0, api_route)
     return app
 
 App.create_app = custom_create_app
