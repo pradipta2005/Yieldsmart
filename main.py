@@ -34,23 +34,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-@app.on_event("startup")
-def startup_event():
-    import threading
-    def warm_up_model_bg():
-        try:
-            from model_service import get_model
-            import numpy as np
-            print("Warming up model in background...")
-            model = get_model()
-            dummy_input = np.zeros((1, 160, 160, 3), dtype=np.float32)
-            _ = model(dummy_input, training=False)
-            print("Model warm-up complete.")
-        except Exception as e:
-            print("Model warm-up failed:", e)
-            
-    threading.Thread(target=warm_up_model_bg, daemon=True).start()
-
+# CORS origins configuration
 cors_origins_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
 CORS_ORIGINS = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
 
