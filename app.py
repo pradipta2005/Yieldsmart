@@ -18,6 +18,9 @@ def custom_create_app(*args, **kwargs):
         api_routes = [r for r in app.router.routes if getattr(r, "path", "").startswith("/api_v2")]
         non_api_routes = [r for r in app.router.routes if not getattr(r, "path", "").startswith("/api_v2")]
         app.router.routes = api_routes + non_api_routes
+        print("Registered routes in order:")
+        for r in app.router.routes:
+            print(f"  - {getattr(r, 'path', 'No Path')} ({type(r).__name__})")
     return app
 
 App.create_app = custom_create_app
