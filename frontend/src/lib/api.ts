@@ -35,12 +35,12 @@ export interface AuthUser {
 export interface AuthResponse { token: string; user: AuthUser; }
 
 export const apiSignUp = (body: { name:string; email:string; password:string; city:string }) =>
-  req<AuthResponse>("/api_v2/auth/signup", { method: "POST", body: JSON.stringify(body) });
+  req<AuthResponse>("/api/auth/signup", { method: "POST", body: JSON.stringify(body) });
 
 export const apiSignIn = (body: { email:string; password:string }) =>
-  req<AuthResponse>("/api_v2/auth/signin", { method: "POST", body: JSON.stringify(body) });
+  req<AuthResponse>("/api/auth/signin", { method: "POST", body: JSON.stringify(body) });
 
-export const apiMe = () => req<AuthUser & { total_scans:number; diseases_found:number; healthy:number }>("/api_v2/auth/me");
+export const apiMe = () => req<AuthUser & { total_scans:number; diseases_found:number; healthy:number }>("/api/auth/me");
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export interface WeatherData {
@@ -71,7 +71,7 @@ export interface DashboardData {
   forecast: ForecastDay[]; season: string;
 }
 export const apiDashboard = (city: string) =>
-  req<DashboardData>(`/api_v2/dashboard?city=${encodeURIComponent(city)}`);
+  req<DashboardData>(`/api/dashboard?city=${encodeURIComponent(city)}`);
 
 // ── Disease ───────────────────────────────────────────────────────────────────
 export interface Treatment { method: string; ratio: string; frequency: string; }
@@ -90,7 +90,7 @@ export interface DiseaseResult {
 export async function apiDetect(file: File): Promise<DiseaseResult> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${BASE}/api_v2/detect-disease`, {
+  const res = await fetch(`${BASE}/api/detect-disease`, {
     method: "POST",
     headers: authHeaders(),
     body: form,
@@ -112,4 +112,4 @@ export interface HistoryData {
   history: ScanHistoryItem[];
   stats: { total_scans: number; diseases_found: number; healthy: number };
 }
-export const apiHistory = () => req<HistoryData>("/api_v2/history");
+export const apiHistory = () => req<HistoryData>("/api/history");

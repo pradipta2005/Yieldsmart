@@ -64,13 +64,13 @@ class SignInRequest(BaseModel):
 def root():
     return {"status": "ok", "app": "YieldSmart API v2"}
 
-@app.get("/api_v2/health")
+@app.get("/api/health")
 def health():
     return {"status": "healthy", "season": get_current_season(), "version": "2.0.0"}
 
 # ── Auth Routes ───────────────────────────────────────────────────────────────
 
-@app.post("/api_v2/auth/signup")
+@app.post("/api/auth/signup")
 def signup(body: SignUpRequest):
     """Register a new farmer account."""
     if len(body.password) < 6:
@@ -89,7 +89,7 @@ def signup(body: SignUpRequest):
     token = create_access_token(user["id"], user["email"])
     return {"token": token, "user": user}
 
-@app.post("/api_v2/auth/signin")
+@app.post("/api/auth/signin")
 def signin(body: SignInRequest):
     """Sign in with email + password."""
     user = authenticate_user(body.email, body.password)
@@ -98,7 +98,7 @@ def signin(body: SignInRequest):
     token = create_access_token(user["id"], user["email"])
     return {"token": token, "user": user}
 
-@app.get("/api_v2/auth/me")
+@app.get("/api/auth/me")
 def me(current_user: dict = Depends(get_current_user)):
     """Get current authenticated user profile."""
     stats = get_scan_stats(current_user["id"])
@@ -106,7 +106,7 @@ def me(current_user: dict = Depends(get_current_user)):
 
 # ── Dashboard ─────────────────────────────────────────────────────────────────
 
-@app.get("/api_v2/dashboard")
+@app.get("/api/dashboard")
 def dashboard(
     city: str = Query(...),
     current_user: dict = Depends(get_optional_user)
@@ -139,7 +139,7 @@ def dashboard(
 
 # ── Disease Detection ─────────────────────────────────────────────────────────
 
-@app.post("/api_v2/detect-disease")
+@app.post("/api/detect-disease")
 async def detect_disease(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_optional_user)
@@ -177,7 +177,7 @@ async def detect_disease(
 
 # ── History ───────────────────────────────────────────────────────────────────
 
-@app.get("/api_v2/history")
+@app.get("/api/history")
 def scan_history(
     limit: int = Query(default=20, le=100),
     current_user: dict = Depends(get_current_user)

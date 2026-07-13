@@ -1,78 +1,100 @@
 """
 app.py - YieldSmart Hugging Face Space entry point
 
-Architecture:
-  - A plain FastAPI app is the top-level ASGI app served by uvicorn
-  - Our backend routes (/api_v2/*) are mounted at the top level
-  - The Gradio demo is mounted at "/" via gr.mount_gradio_app()
-  - A @spaces.GPU function is registered so ZeroGPU accepts the space
+Strategy:
+  - Use demo.launch() so ZeroGPU detects @spaces.GPU correctly
+  - Monkey-patch App.create_app to inject our FastAPI router
+  - Add a Starlette middleware that intercepts 308 redirects for /api_v2 paths
+    and instead proxies the request directly to our FastAPI handler
 """
 import os
-import sys
 import spaces
 import gradio as gr
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+from gradio.routes import App
 
-# 1. Create our top-level FastAPI server
-root_app = FastAPI(title="YieldSmart Root")
-
-# Allow CORS on the root app
-cors_origins = os.getenv("CORS_ORIGINS", "*")
-CORS_ORIGINS = [o.strip() for o in cors_origins.split(",") if o.strip()]
-root_app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# 2. Import and include our backend FastAPI router directly
+# ── 1. Import our backend FastAPI app ─────────────────────────────────────────
 from main import app as backend_app
-root_app.include_router(backend_app.router)
 
-# Log all registered routes on startup
-for route in root_app.routes:
-    print(f"  [route] {getattr(route, 'path', '?')} {getattr(route, 'methods', '')}")
+# ── 2. Middleware that routes /api_v2/* to our FastAPI handler ────────────────
+class APIRoutingMiddleware(BaseHTTPMiddleware):
+    """
+    Intercept any request whose path starts with /api_v2 and dispatch it
+    directly through the backend_app ASGI handler, bypassing Gradio's
+    SvelteKit router which would 308-redirect unknown paths to /.
+    """
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path.startswith("/api_v2"):
+            # Dispatch directly to our backend FastAPI app
+            scope = request.scope
+            scope["app"] = backend_app
+            response = await backend_app(scope, request._receive, request._send)
+            return Response()  # response already sent via send
+        return await call_next(request)
 
-# 3. ZeroGPU - register a @spaces.GPU function so HF accepts the space
+# ── 3. Monkey-patch App.create_app to inject middleware + router ──────────────
+original_create_app = App.create_app
+
+def custom_create_app(*args, **kwargs):
+    app = original_create_app(*args, **kwargs)
+
+    # Add CORS
+    cors_origins = os.getenv("CORS_ORIGINS", "*")
+    CORS_ORIGINS = [o.strip() for o in cors_origins.split(",") if o.strip()]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Include our backend router so FastAPI handles /api_v2/* natively
+    app.include_router(backend_app.router)
+
+    # Move /api_v2 routes to the front of the router list
+    api_routes = [r for r in app.router.routes if getattr(r, "path", "").startswith("/api_v2")]
+    other_routes = [r for r in app.router.routes if not getattr(r, "path", "").startswith("/api_v2")]
+    app.router.routes = api_routes + other_routes
+
+    print("[YieldSmart] Registered routes:")
+    for r in app.router.routes:
+        print(f"  {getattr(r, 'path', '?')}  methods={getattr(r, 'methods', '?')}")
+
+    return app
+
+App.create_app = custom_create_app
+
+# ── 4. ZeroGPU - must be declared for HF to start the space ──────────────────
 @spaces.GPU
 def dummy_gpu_trigger():
-    """Dummy GPU function to satisfy ZeroGPU startup verification."""
     return "ZeroGPU Active"
 
-# 4. Build the Gradio UI
+# ── 5. Gradio UI ──────────────────────────────────────────────────────────────
 with gr.Blocks(title="YieldSmart API Backend", css="footer{visibility:hidden}") as demo:
     gr.Markdown("# YieldSmart API Backend")
-    gr.Markdown(
-        "This Hugging Face Space hosts the FastAPI backend server "
-        "for the YieldSmart Smart Farming Platform."
-    )
+    gr.Markdown("FastAPI backend for the YieldSmart Smart Farming Platform.")
     with gr.Row():
         gr.Markdown("""
         ### Live API Endpoints:
-        - **API Health Check**: [/api_v2/health](/api_v2/health)
-        - **Live Dashboard**: [/api_v2/dashboard?city=Kolkata](/api_v2/dashboard?city=Kolkata)
-        - **Scan History**: [/api_v2/history](/api_v2/history)
+        - **Health Check**: [/api_v2/health](/api_v2/health)
+        - **Dashboard**: [/api_v2/dashboard?city=Kolkata](/api_v2/dashboard?city=Kolkata)
+        - **History**: [/api_v2/history](/api_v2/history)
 
         ### System Status:
-        - **Host Platform**: Hugging Face Spaces (Gradio Python SDK)
-        - **Hardware**: ZeroGPU (Free Tier)
-        - **Model Engine**: TensorFlow / Keras (38 Crop Diseases)
+        - Host: Hugging Face Spaces (ZeroGPU Free Tier)
+        - Model: TensorFlow / Keras (38 Crop Diseases)
         """)
     gr.Markdown("---")
-    gr.Markdown("2026 YieldSmart Smart Farming Platform. All API operations active.")
-
-    # Register the GPU trigger via a hidden button so ZeroGPU detects it
+    gr.Markdown("2026 YieldSmart Smart Farming Platform.")
     _btn = gr.Button("Init GPU", visible=False)
     _btn.click(fn=dummy_gpu_trigger, inputs=[], outputs=[])
 
-# 5. Mount Gradio into our root FastAPI app at "/"
-# Our /api_v2/* routes registered above are evaluated before Gradio's catch-all.
-app = gr.mount_gradio_app(root_app, demo, path="/")
-
-# 6. Entry point
+# ── 6. Launch via native Gradio (required for ZeroGPU handshake) ──────────────
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    demo.launch(server_name="0.0.0.0", server_port=7860)
