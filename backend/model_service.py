@@ -20,6 +20,9 @@ if not os.path.exists(MODEL_PATH):
     if os.path.exists(parent_path):
         MODEL_PATH = parent_path
 
+# Global cache for the resolved model path (which might point to the Hugging Face hub cache)
+RESOLVED_MODEL_PATH = MODEL_PATH
+
 # TF 2.13 compatibility: suppress noisy warnings
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 LABELS_PATH = os.path.join(os.path.dirname(__file__), "class_labels.json")
@@ -33,35 +36,50 @@ def get_labels():
     return _class_labels
 
 def check_and_download_model():
-    """Download the keras model from GitHub Releases if it does not exist locally."""
-    if not os.path.exists(MODEL_PATH):
-        print(f"Model file not found at {MODEL_PATH}.")
-        print("Downloading plant_disease_recog_model.keras from GitHub Releases (770MB)...")
+    """Ensure the actual 770MB Keras model file is resolved, downloading it if it is missing or a Git LFS pointer."""
+    global RESOLVED_MODEL_PATH
+    
+    needs_download = False
+    if not os.path.exists(RESOLVED_MODEL_PATH):
+        needs_download = True
+    elif os.path.getsize(RESOLVED_MODEL_PATH) < 100000:
+        print(f"Model file at {RESOLVED_MODEL_PATH} is a Git LFS pointer ({os.path.getsize(RESOLVED_MODEL_PATH)} bytes).")
+        needs_download = True
+        
+    if needs_download:
+        print("Resolving model file via Hugging Face Hub download...")
+        try:
+            from huggingface_hub import hf_hub_download
+            downloaded_path = hf_hub_download(
+                repo_id="pradipta2005/yieldsmart-api",
+                repo_type="space",
+                filename="plant_disease_recog_model.keras"
+            )
+            RESOLVED_MODEL_PATH = downloaded_path
+            print("Model resolved successfully via HF Hub:", RESOLVED_MODEL_PATH)
+            return
+        except Exception as hf_err:
+            print("HF Hub download failed, falling back to direct URL download:", hf_err)
+            
         url = "https://github.com/pradipta2005/Yieldsmart/releases/download/model/plant_disease_recog_model.keras"
         try:
             import requests
             response = requests.get(url, stream=True, timeout=60)
             response.raise_for_status()
             
-            temp_path = MODEL_PATH + ".tmp"
-            total_size = int(response.headers.get('content-length', 0))
-            downloaded = 0
-            
+            temp_path = RESOLVED_MODEL_PATH + ".tmp"
             with open(temp_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
-                        downloaded += len(chunk)
-                        
-            os.replace(temp_path, MODEL_PATH)
+            os.replace(temp_path, RESOLVED_MODEL_PATH)
             print("Download complete. Model saved successfully.")
         except Exception as e:
-            if os.path.exists(MODEL_PATH + ".tmp"):
-                os.remove(MODEL_PATH + ".tmp")
+            if os.path.exists(RESOLVED_MODEL_PATH + ".tmp"):
+                os.remove(RESOLVED_MODEL_PATH + ".tmp")
             raise FileNotFoundError(
-                f"Model file not found at {MODEL_PATH} and auto-download failed: {e}. "
-                "Please create a GitHub release tagged 'model' and upload the model file, "
-                "or place the model file manually in the project root directory."
+                f"Model file not found at {RESOLVED_MODEL_PATH} and auto-download failed: {e}. "
+                "Please place the model file manually in the backend directory."
             )
 
 def get_model():
@@ -70,8 +88,8 @@ def get_model():
         if _model is None:
             check_and_download_model()
             import tensorflow as tf
-            print("Loading Keras model... (this may take a moment)")
-            _model = tf.keras.models.load_model(MODEL_PATH)
+            print(f"Loading Keras model from {RESOLVED_MODEL_PATH}... (this may take a moment)")
+            _model = tf.keras.models.load_model(RESOLVED_MODEL_PATH)
             print("Model loaded successfully.")
         return _model
 
