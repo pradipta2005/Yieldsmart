@@ -77,12 +77,17 @@ def get_interpreter():
         return _interpreter
 
 def compute_normalized_confidence(preds):
-    min_val = np.min(preds)
-    max_val = np.max(preds)
-    if max_val - min_val == 0:
-        return np.ones_like(preds) / len(preds)
-    normalized = (preds - min_val) / (max_val - min_val)
-    return normalized / np.sum(normalized)
+    """
+    Convert sigmoid outputs to a relative probability distribution.
+    Reconstructs logits: logit = log(p / (1 - p)).
+    Applies softmax to the reconstructed logits to normalize.
+    """
+    eps = 1e-7
+    clipped_preds = np.clip(preds, eps, 1.0 - eps)
+    logits = np.log(clipped_preds / (1.0 - clipped_preds))
+    # Subtract max logit for numerical stability
+    exp_logits = np.exp(logits - np.max(logits))
+    return exp_logits / np.sum(exp_logits)
 
 def is_green_dominant(img: Image.Image, threshold=0.15) -> bool:
     img_hsv = img.convert("HSV")
