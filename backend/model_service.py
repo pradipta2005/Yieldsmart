@@ -96,7 +96,7 @@ def get_model():
 
 
 # Number of valid plant disease classes
-NUM_CLASSES = 38
+NUM_CLASSES = 48
 
 def compute_normalized_confidence(preds):
     """

@@ -89,7 +89,7 @@ export default function DiseasePage() {
             Plant Disease Scanner
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", maxWidth: 520, lineHeight: 1.6 }}>
-            Upload a clear photo of a leaf. Our neural network identifies the disease across 38 plant types and prescribes a treatment plan.
+            Upload a clear photo of a leaf. Our neural network identifies the disease across 48 plant types and prescribes a treatment plan.
           </p>
         </div>
 

@@ -61,7 +61,7 @@ export default function Home() {
       border: "rgba(52,211,153,0.15)",
       title: "Snap. Scan. Treat.",
       desc: "Point your phone at a troubled leaf. Our model names the disease in under two seconds and hands you a treatment plan — organic options included.",
-      stat: "38+",
+      stat: "48+",
       statLabel: "Diseases Covered",
       tag: "AI Powered",
     },
@@ -200,7 +200,7 @@ export default function Home() {
             maxWidth: 560, margin: "0 auto 20px", lineHeight: 1.7,
             textShadow: "0 2px 20px rgba(0,0,0,0.9)",
           }}>
-            Satellite-grade weather data, soil science, and a neural network trained on 38 crop diseases — so you spend less time guessing and more time growing.
+            Satellite-grade weather data, soil science, and a neural network trained on 48 crop diseases — so you spend less time guessing and more time growing.
           </p>
 
           <p className="anim-fade-up delay-500" style={{
@@ -237,7 +237,7 @@ export default function Home() {
       <section style={{ padding: "52px 24px", background: "var(--bg-secondary)", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div className="reveal" style={{ ...revealStyle(0), maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 32, textAlign: "center" }}>
           {[
-            { value: "38+", label: "Diseases Identified" },
+            { value: "48+", label: "Diseases Identified" },
             { value: "< 2s", label: "Scan Speed" },
             { value: "5-Day", label: "Forecast Depth" },
           ].map((s, i) => (

@@ -23,4 +23,4 @@ RUN chmod -R 777 /app
 EXPOSE 7860
 
 # Start FastAPI server binding to host 0.0.0.0 on port 7860
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "4"]
