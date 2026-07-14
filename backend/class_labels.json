@@ -54,13 +54,13 @@
       "display": "Apple Scab",
       "plant": "Apple",
       "severity": "moderate",
-      "cause": "Caused by the fungus Venturia inaequalis. It thrives in cool, wet spring weather when temperatures are between 10\u201324\u00b0C and moisture persists on leaves for 9+ hours.",
+      "cause": "Caused by the fungus Venturia inaequalis. It thrives in cool, wet spring weather when temperatures are between 10–24°C and moisture persists on leaves for 9+ hours.",
       "symptoms": "Olive-green to brown velvety spots on leaves and fruit. Infected leaves may curl and fall prematurely.",
       "treatments": [
         {
           "method": "Captan Fungicide",
           "ratio": "Captan 50WP : Water = 2g : 1L",
-          "frequency": "Every 7\u201310 days during wet season"
+          "frequency": "Every 7–10 days during wet season"
         },
         {
           "method": "Neem Oil Spray",
@@ -85,13 +85,13 @@
       "display": "Apple Black Rot",
       "plant": "Apple",
       "severity": "severe",
-      "cause": "Caused by the fungus Botryosphaeria obtusa. Infects through wounds and enters bark during warm, humid weather (24\u201329\u00b0C).",
+      "cause": "Caused by the fungus Botryosphaeria obtusa. Infects through wounds and enters bark during warm, humid weather (24–29°C).",
       "symptoms": "Brown circular lesions on leaves with purple margins. Fruit shows 'frog-eye' leaf spots and eventually turns black.",
       "treatments": [
         {
           "method": "Thiophanate-methyl",
           "ratio": "1.5ml per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         },
         {
           "method": "Captan Spray",
@@ -115,13 +115,13 @@
       "display": "Cedar Apple Rust",
       "plant": "Apple",
       "severity": "moderate",
-      "cause": "Caused by the fungus Gymnosporangium juniperi-virginianae. Requires two hosts \u2014 cedar/juniper and apple trees \u2014 to complete its life cycle.",
+      "cause": "Caused by the fungus Gymnosporangium juniperi-virginianae. Requires two hosts — cedar/juniper and apple trees — to complete its life cycle.",
       "symptoms": "Bright orange-yellow spots on upper leaf surfaces with tube-like spore structures underneath.",
       "treatments": [
         {
           "method": "Myclobutanil Fungicide",
           "ratio": "1.5ml per litre of water",
-          "frequency": "Every 7\u201310 days from bud break"
+          "frequency": "Every 7–10 days from bud break"
         },
         {
           "method": "Mancozeb",
@@ -144,21 +144,26 @@
       "symptoms": "Leaves appear green, vibrant, and free of spots or discolouration.",
       "treatments": [],
       "prevention": [
-        "Continue standard care \u2014 balanced NPK fertilizer",
+        "Continue standard care — balanced NPK fertilizer",
         "Regular pruning for airflow",
         "Inspect weekly during monsoon season"
       ],
       "organic": true
     },
     "Background_without_leaves": {
-      "display": "Background without leaves",
-      "plant": "Background",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
+      "display": "No Plant Detected",
+      "plant": "Unknown",
+      "severity": "healthy",
+      "cause": "The image does not appear to contain a recognisable plant leaf. The model detected a background image.",
+      "symptoms": "No disease symptoms detected. Please upload a clear, close-up photo of a single plant leaf with good lighting.",
       "treatments": [],
-      "prevention": [],
-      "organic": false
+      "prevention": [
+        "Take photo in good, natural lighting",
+        "Ensure the leaf fills most of the frame",
+        "Use a plain background if possible",
+        "Avoid blurry or out-of-focus photos"
+      ],
+      "organic": true
     },
     "Blueberry___healthy": {
       "display": "Healthy Blueberry",
@@ -168,7 +173,7 @@
       "symptoms": "Plant looks healthy with vibrant foliage.",
       "treatments": [],
       "prevention": [
-        "Maintain soil pH between 4.5\u20135.5",
+        "Maintain soil pH between 4.5–5.5",
         "Mulch with pine bark",
         "Water consistently, avoiding waterlogging"
       ],
@@ -178,13 +183,13 @@
       "display": "Cherry Powdery Mildew",
       "plant": "Cherry",
       "severity": "moderate",
-      "cause": "Caused by the fungus Podosphaera clandestina. Favours dry conditions with high humidity, temperatures between 15\u201327\u00b0C, and poor air circulation.",
+      "cause": "Caused by the fungus Podosphaera clandestina. Favours dry conditions with high humidity, temperatures between 15–27°C, and poor air circulation.",
       "symptoms": "White powdery coating on young leaves, shoots, and fruit. Leaves may curl and distort.",
       "treatments": [
         {
           "method": "Sulfur Dust/Spray",
           "ratio": "Wettable Sulfur : Water = 3g : 1L",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         },
         {
           "method": "Potassium Bicarbonate",
@@ -222,7 +227,7 @@
       "display": "Corn Gray Leaf Spot",
       "plant": "Corn (Maize)",
       "severity": "severe",
-      "cause": "Caused by the fungus Cercospora zeae-maydis. Favoured by warm (25\u201330\u00b0C), humid, cloudy weather with extended periods of leaf wetness.",
+      "cause": "Caused by the fungus Cercospora zeae-maydis. Favoured by warm (25–30°C), humid, cloudy weather with extended periods of leaf wetness.",
       "symptoms": "Tan to gray rectangular lesions parallel to leaf veins. Severe infections can cause significant yield loss.",
       "treatments": [
         {
@@ -238,12 +243,12 @@
         {
           "method": "Mancozeb Spray",
           "ratio": "2.5g per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         }
       ],
       "prevention": [
         "Plant resistant hybrids",
-        "Crop rotation \u2014 avoid corn after corn",
+        "Crop rotation — avoid corn after corn",
         "Bury crop residue post harvest",
         "Ensure proper plant spacing"
       ],
@@ -253,7 +258,7 @@
       "display": "Corn Common Rust",
       "plant": "Corn (Maize)",
       "severity": "moderate",
-      "cause": "Caused by the fungus Puccinia sorghi. Spreads via airborne spores in cool (16\u201323\u00b0C), humid conditions with heavy dew.",
+      "cause": "Caused by the fungus Puccinia sorghi. Spreads via airborne spores in cool (16–23°C), humid conditions with heavy dew.",
       "symptoms": "Small, circular to elongated, brick-red pustules on both leaf surfaces.",
       "treatments": [
         {
@@ -278,8 +283,8 @@
       "display": "Corn Northern Leaf Blight",
       "plant": "Corn (Maize)",
       "severity": "severe",
-      "cause": "Caused by the fungus Exserohilum turcicum. Favoured by moderate temperatures (18\u201327\u00b0C) and extended periods of humid weather.",
-      "symptoms": "Long (2.5\u201315 cm), elliptical, tan-gray lesions on leaves. Can cause 30\u201350% yield loss in severe cases.",
+      "cause": "Caused by the fungus Exserohilum turcicum. Favoured by moderate temperatures (18–27°C) and extended periods of humid weather.",
+      "symptoms": "Long (2.5–15 cm), elliptical, tan-gray lesions on leaves. Can cause 30–50% yield loss in severe cases.",
       "treatments": [
         {
           "method": "Azoxystrobin + Propiconazole",
@@ -289,7 +294,7 @@
         {
           "method": "Mancozeb",
           "ratio": "2.5g per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         }
       ],
       "prevention": [
@@ -317,13 +322,13 @@
       "display": "Grape Black Rot",
       "plant": "Grape",
       "severity": "severe",
-      "cause": "Caused by the fungus Guignardia bidwellii. Thrives in warm (21\u201326\u00b0C), rainy weather. Spores are released during rainfall.",
+      "cause": "Caused by the fungus Guignardia bidwellii. Thrives in warm (21–26°C), rainy weather. Spores are released during rainfall.",
       "symptoms": "Reddish-brown circular lesions on leaves with dark borders. Fruit shrivels into hard, black 'mummies'.",
       "treatments": [
         {
           "method": "Myclobutanil (Eagle)",
           "ratio": "1.5ml per litre of water",
-          "frequency": "Every 10\u201314 days from bud break"
+          "frequency": "Every 10–14 days from bud break"
         },
         {
           "method": "Mancozeb",
@@ -333,7 +338,7 @@
         {
           "method": "Captan",
           "ratio": "2g per litre of water",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         }
       ],
       "prevention": [
@@ -351,7 +356,7 @@
       "symptoms": "Interveinal leaf chlorosis with reddish-brown margins (tiger stripe). Fruit shows dark spotting. Vine may suddenly wilt and die (apoplexy).",
       "treatments": [
         {
-          "method": "Arsenic Pentoxide (sodium arsenite \u2014 restricted)",
+          "method": "Arsenic Pentoxide (sodium arsenite — restricted)",
           "ratio": "Use only as prescribed by a licensed agronomist",
           "frequency": "Post-harvest wound treatment"
         },
@@ -379,7 +384,7 @@
         {
           "method": "Copper Oxychloride",
           "ratio": "3g per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         },
         {
           "method": "Mancozeb",
@@ -412,12 +417,12 @@
       "display": "Citrus Greening (HLB)",
       "plant": "Orange / Citrus",
       "severity": "critical",
-      "cause": "Caused by the bacterium Candidatus Liberibacter asiaticus, spread by the Asian citrus psyllid insect. There is NO cure \u2014 infected trees must be removed.",
+      "cause": "Caused by the bacterium Candidatus Liberibacter asiaticus, spread by the Asian citrus psyllid insect. There is NO cure — infected trees must be removed.",
       "symptoms": "Asymmetric yellowing (blotchy mottle) of leaves. Fruit is small, lopsided, bitter, and may have aborted seeds.",
       "treatments": [
         {
           "method": "Remove Infected Trees",
-          "ratio": "N/A \u2014 destroy and remove tree immediately",
+          "ratio": "N/A — destroy and remove tree immediately",
           "frequency": "Immediately upon confirmation"
         },
         {
@@ -438,13 +443,13 @@
       "display": "Peach Bacterial Spot",
       "plant": "Peach",
       "severity": "moderate",
-      "cause": "Caused by the bacterium Xanthomonas arboricola pv. pruni. Spreads during warm (24\u201328\u00b0C), wet, windy weather.",
+      "cause": "Caused by the bacterium Xanthomonas arboricola pv. pruni. Spreads during warm (24–28°C), wet, windy weather.",
       "symptoms": "Small, water-soaked spots on leaves that turn purple-brown. Fruit shows cracked, sunken lesions.",
       "treatments": [
         {
           "method": "Copper Hydroxide",
           "ratio": "3g per litre of water",
-          "frequency": "Every 7\u201310 days in wet season"
+          "frequency": "Every 7–10 days in wet season"
         },
         {
           "method": "Oxytetracycline (antibiotic)",
@@ -478,7 +483,7 @@
       "display": "Bell Pepper Bacterial Spot",
       "plant": "Bell Pepper",
       "severity": "moderate",
-      "cause": "Caused by Xanthomonas campestris pv. vesicatoria. Thrives in warm (24\u201330\u00b0C), wet, stormy conditions. Spreads rapidly by rain splash.",
+      "cause": "Caused by Xanthomonas campestris pv. vesicatoria. Thrives in warm (24–30°C), wet, stormy conditions. Spreads rapidly by rain splash.",
       "symptoms": "Small, water-soaked spots on leaves and fruit that turn brown and scabby. Defoliation can occur.",
       "treatments": [
         {
@@ -494,7 +499,7 @@
       ],
       "prevention": [
         "Use certified disease-free seed/transplants",
-        "Crop rotation \u2014 avoid peppers/tomatoes in same spot 2 years running",
+        "Crop rotation — avoid peppers/tomatoes in same spot 2 years running",
         "Avoid overhead irrigation",
         "Stake plants for airflow"
       ],
@@ -518,7 +523,7 @@
       "display": "Potato Early Blight",
       "plant": "Potato",
       "severity": "moderate",
-      "cause": "Caused by the fungus Alternaria solani. Favours warm (24\u201329\u00b0C), dry days followed by wet nights with heavy dew. Commonly infects stressed or aging plants.",
+      "cause": "Caused by the fungus Alternaria solani. Favours warm (24–29°C), dry days followed by wet nights with heavy dew. Commonly infects stressed or aging plants.",
       "symptoms": "Dark brown, circular spots with concentric rings (target-board pattern) on older lower leaves. Causes premature defoliation.",
       "treatments": [
         {
@@ -529,7 +534,7 @@
         {
           "method": "Mancozeb",
           "ratio": "2.5g per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         },
         {
           "method": "Neem Oil (Organic)",
@@ -541,7 +546,7 @@
         "Remove and destroy infected leaves",
         "Avoid overhead watering",
         "Maintain plant vigour with balanced fertilization",
-        "Rotate crops \u2014 avoid planting potato/tomato in same area"
+        "Rotate crops — avoid planting potato/tomato in same area"
       ],
       "organic": true
     },
@@ -549,13 +554,13 @@
       "display": "Potato Late Blight",
       "plant": "Potato",
       "severity": "critical",
-      "cause": "Caused by the oomycete Phytophthora infestans \u2014 the pathogen behind the Irish Potato Famine. Spreads explosively in cool (10\u201320\u00b0C), wet, humid conditions.",
+      "cause": "Caused by the oomycete Phytophthora infestans — the pathogen behind the Irish Potato Famine. Spreads explosively in cool (10–20°C), wet, humid conditions.",
       "symptoms": "Water-soaked, pale green lesions on leaves that rapidly turn dark brown to black. White mold visible on leaf undersides in humid conditions.",
       "treatments": [
         {
           "method": "Metalaxyl + Mancozeb (Ridomil Gold)",
           "ratio": "2.5g per litre of water",
-          "frequency": "Every 7 days \u2014 start immediately"
+          "frequency": "Every 7 days — start immediately"
         },
         {
           "method": "Cymoxanil + Mancozeb",
@@ -565,7 +570,7 @@
         {
           "method": "Copper Oxychloride (Organic)",
           "ratio": "3g per litre of water",
-          "frequency": "Every 5\u20137 days in wet weather"
+          "frequency": "Every 5–7 days in wet weather"
         }
       ],
       "prevention": [
@@ -623,7 +628,7 @@
       "display": "Squash Powdery Mildew",
       "plant": "Squash",
       "severity": "moderate",
-      "cause": "Caused by the fungus Erysiphe cichoracearum and Sphaerotheca fuliginea. Thrives in warm (20\u201327\u00b0C), dry conditions with low soil moisture but high humidity.",
+      "cause": "Caused by the fungus Erysiphe cichoracearum and Sphaerotheca fuliginea. Thrives in warm (20–27°C), dry conditions with low soil moisture but high humidity.",
       "symptoms": "White, powdery spots on upper and lower leaf surfaces. Leaves turn yellow and die as disease progresses.",
       "treatments": [
         {
@@ -634,7 +639,7 @@
         {
           "method": "Sulfur-based Fungicide",
           "ratio": "3g wettable sulfur per litre of water",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         },
         {
           "method": "Neem Oil",
@@ -644,7 +649,7 @@
         {
           "method": "Baking Soda Spray (emergency)",
           "ratio": "1 tsp baking soda + 1 tsp soap per litre",
-          "frequency": "Every 3\u20134 days"
+          "frequency": "Every 3–4 days"
         }
       ],
       "prevention": [
@@ -665,12 +670,12 @@
         {
           "method": "Myclobutanil",
           "ratio": "1.5ml per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         },
         {
           "method": "Captan",
           "ratio": "2g per litre of water",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         }
       ],
       "prevention": [
@@ -689,7 +694,7 @@
       "symptoms": "Bright green, healthy trifoliate leaves.",
       "treatments": [],
       "prevention": [
-        "Renew beds every 3\u20134 years",
+        "Renew beds every 3–4 years",
         "Maintain straw mulch",
         "Scout for two-spotted spider mites in hot weather"
       ],
@@ -699,7 +704,7 @@
       "display": "Tomato Bacterial Spot",
       "plant": "Tomato",
       "severity": "moderate",
-      "cause": "Caused by Xanthomonas species. Spreads rapidly during warm (24\u201330\u00b0C), rainy, stormy weather via rain splash.",
+      "cause": "Caused by Xanthomonas species. Spreads rapidly during warm (24–30°C), rainy, stormy weather via rain splash.",
       "symptoms": "Small, water-soaked spots on leaves, stems, and fruit that turn dark brown with yellow halos.",
       "treatments": [
         {
@@ -725,7 +730,7 @@
       "display": "Tomato Early Blight",
       "plant": "Tomato",
       "severity": "moderate",
-      "cause": "Caused by Alternaria solani. Attacks stressed, mature, or aging plants in warm (24\u201329\u00b0C), humid conditions.",
+      "cause": "Caused by Alternaria solani. Attacks stressed, mature, or aging plants in warm (24–29°C), humid conditions.",
       "symptoms": "Dark brown spots with concentric rings and yellow halos on lower, older leaves. Lesions spread upward.",
       "treatments": [
         {
@@ -756,13 +761,13 @@
       "display": "Tomato Late Blight",
       "plant": "Tomato",
       "severity": "critical",
-      "cause": "Caused by Phytophthora infestans. Spreads catastrophically in cool (10\u201320\u00b0C), wet, foggy conditions. Highly infectious \u2014 can destroy an entire crop in days.",
+      "cause": "Caused by Phytophthora infestans. Spreads catastrophically in cool (10–20°C), wet, foggy conditions. Highly infectious — can destroy an entire crop in days.",
       "symptoms": "Water-soaked dark lesions on leaves/stems. White mold on undersides. Fruit develops dark, greasy spots.",
       "treatments": [
         {
           "method": "Metalaxyl + Mancozeb",
           "ratio": "2.5g per litre of water",
-          "frequency": "Every 5\u20137 days \u2014 act immediately"
+          "frequency": "Every 5–7 days — act immediately"
         },
         {
           "method": "Cymoxanil (Curzate)",
@@ -772,11 +777,11 @@
         {
           "method": "Copper Oxychloride (Organic)",
           "ratio": "3g per litre of water",
-          "frequency": "Every 5\u20137 days"
+          "frequency": "Every 5–7 days"
         }
       ],
       "prevention": [
-        "Destroy infected plants \u2014 do NOT compost",
+        "Destroy infected plants — do NOT compost",
         "Avoid wetting foliage",
         "Apply protectant fungicide before blight-risk weather",
         "Plant resistant varieties"
@@ -793,7 +798,7 @@
         {
           "method": "Chlorothalonil",
           "ratio": "2.5ml per litre of water",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         },
         {
           "method": "Potassium Bicarbonate",
@@ -818,7 +823,7 @@
       "display": "Tomato Septoria Leaf Spot",
       "plant": "Tomato",
       "severity": "moderate",
-      "cause": "Caused by the fungus Septoria lycopersici. Most common after first fruit sets. Favours warm (20\u201325\u00b0C), wet, humid conditions.",
+      "cause": "Caused by the fungus Septoria lycopersici. Most common after first fruit sets. Favours warm (20–25°C), wet, humid conditions.",
       "symptoms": "Many small circular spots with dark borders and white/gray centers on lower leaves. Spreads rapidly upward.",
       "treatments": [
         {
@@ -829,7 +834,7 @@
         {
           "method": "Copper Hydroxide",
           "ratio": "3g per litre of water",
-          "frequency": "Every 7\u201310 days"
+          "frequency": "Every 7–10 days"
         },
         {
           "method": "Mancozeb",
@@ -846,14 +851,35 @@
       "organic": false
     },
     "Tomato___Spider_mites Two-spotted_spider_mite": {
-      "display": "Tomato   Spider mites Two-spotted spider mite",
+      "display": "Tomato Spider Mites (Two-spotted)",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
-      "organic": false
+      "severity": "moderate",
+      "cause": "Caused by Tetranychus urticae (Two-spotted spider mite). Thrives in hot, dry conditions (above 28C). Populations can explode within days. Resistance to miticides is common.",
+      "symptoms": "Tiny yellow or white stippling dots on upper leaf surface. Fine, silky webbing between leaves and on undersides. Leaves turn bronze, dry out, and drop. Heavy infestation causes complete defoliation.",
+      "treatments": [
+        {
+          "name": "Abamectin (Vertimec)",
+          "ratio": "0.5ml per litre of water",
+          "freq": "Every 7 days, max 2 applications"
+        },
+        {
+          "name": "Spiromesifen (Oberon)",
+          "ratio": "As per label",
+          "freq": "Every 14 days, alternate with Abamectin"
+        },
+        {
+          "name": "Neem oil spray (organic)",
+          "ratio": "5ml per litre of water",
+          "freq": "Every 5-7 days in evening"
+        }
+      ],
+      "prevention": [
+        "Check leaf undersides regularly with a hand lens",
+        "Avoid drought stress - mites thrive on water-stressed plants",
+        "Introduce predatory mites (Phytoseiulus persimilis) as biocontrol",
+        "Avoid excessive nitrogen which produces lush growth attractive to mites"
+      ],
+      "organic": true
     },
     "Tomato___Target_Spot": {
       "display": "Tomato Target Spot",
@@ -865,7 +891,7 @@
         {
           "method": "Azoxystrobin",
           "ratio": "1ml per litre of water",
-          "frequency": "Every 10\u201314 days"
+          "frequency": "Every 10–14 days"
         },
         {
           "method": "Chlorothalonil",
@@ -889,11 +915,11 @@
       "treatments": [
         {
           "method": "Remove Infected Plants",
-          "ratio": "N/A \u2014 remove and destroy infected plants to prevent spread",
+          "ratio": "N/A — remove and destroy infected plants to prevent spread",
           "frequency": "Immediately upon confirmation"
         },
         {
-          "method": "Imidacloprid (Confidor) \u2014 whitefly control",
+          "method": "Imidacloprid (Confidor) — whitefly control",
           "ratio": "0.5ml per litre of water",
           "frequency": "Every 15 days on healthy plants"
         },
@@ -920,7 +946,7 @@
       "treatments": [
         {
           "method": "Remove Infected Plants",
-          "ratio": "N/A \u2014 remove and destroy infected plants immediately",
+          "ratio": "N/A — remove and destroy infected plants immediately",
           "frequency": "Immediately upon detection"
         },
         {
@@ -952,93 +978,238 @@
       "organic": true
     },
     "Tomato_leaf": {
-      "display": "Tomato leaf",
+      "display": "Tomato Leaf (Healthy)",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
+      "severity": "healthy",
+      "cause": "No disease detected. This appears to be a healthy tomato leaf.",
+      "symptoms": "Healthy tomato leaves are deep green, firm, and free from spots or discolouration.",
       "treatments": [],
-      "prevention": [],
-      "organic": false
+      "prevention": [
+        "Maintain regular watering schedule",
+        "Ensure adequate spacing for air circulation",
+        "Monitor regularly for early disease signs"
+      ],
+      "organic": true
     },
     "Tomato_leaf_bacterial_spot": {
-      "display": "Tomato leaf bacterial spot",
+      "display": "Tomato Bacterial Spot",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
+      "severity": "moderate",
+      "cause": "Caused by Xanthomonas vesicatoria bacteria. Spreads via splashing water, infected seed, and contaminated tools. Favours warm, wet conditions.",
+      "symptoms": "Small, dark brown water-soaked lesions with yellow halos on leaves. Lesions may coalesce into larger necrotic patches. Severe infection leads to defoliation.",
+      "treatments": [
+        {
+          "name": "Copper Hydroxide Spray",
+          "ratio": "2–3g per litre of water",
+          "freq": "Every 7 days"
+        },
+        {
+          "name": "Copper Oxychloride",
+          "ratio": "3g per litre of water",
+          "freq": "Every 10 days"
+        },
+        {
+          "name": "Bactericide (Streptomycin sulphate)",
+          "ratio": "As per label",
+          "freq": "Weekly spray"
+        }
+      ],
+      "prevention": [
+        "Use certified disease-free seeds",
+        "Avoid overhead irrigation; use drip irrigation",
+        "Remove and destroy infected plant debris",
+        "Rotate crops — avoid growing tomatoes in same field for 2 seasons"
+      ],
       "organic": false
     },
     "Tomato_leaf_late_blight": {
-      "display": "Tomato leaf late blight",
+      "display": "Tomato Late Blight",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
+      "severity": "critical",
+      "cause": "Caused by the oomycete Phytophthora infestans. Spreads explosively in cool (10–20°C), wet, humid conditions via wind-borne spores.",
+      "symptoms": "Water-soaked, pale green lesions on leaves that rapidly turn dark brown to black. White mold visible on leaf undersides in humid conditions. Fruit develops firm, greasy-brown rot.",
+      "treatments": [
+        {
+          "name": "Metalaxyl + Mancozeb (Ridomil Gold)",
+          "ratio": "2.5g per litre of water",
+          "freq": "Every 7 days — start immediately"
+        },
+        {
+          "name": "Cymoxanil + Mancozeb",
+          "ratio": "2.5g per litre of water",
+          "freq": "Every 7 days"
+        },
+        {
+          "name": "Dimethomorph (Acrobat)",
+          "ratio": "2g per litre of water",
+          "freq": "Every 10–14 days"
+        }
+      ],
+      "prevention": [
+        "Plant resistant varieties (e.g. Defiant, Mountain Magic)",
+        "Destroy volunteer tomato/potato plants nearby",
+        "Remove and burn all infected material immediately",
+        "Avoid overhead watering; apply mulch to prevent spore splash"
+      ],
       "organic": false
     },
     "Tomato_leaf_mosaic_virus": {
-      "display": "Tomato leaf mosaic virus",
+      "display": "Tomato Mosaic Virus",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
-      "organic": false
+      "severity": "high",
+      "cause": "Caused by Tomato mosaic virus (ToMV), a highly contagious virus spread by contact, infected tools, and sometimes seeds. Extremely persistent — survives on surfaces for months.",
+      "symptoms": "Mottled, mosaic-patterned yellowing on leaves with alternating light and dark green patches. Leaves may be distorted, curled, or blistered. Fruit shows internal browning.",
+      "treatments": [
+        {
+          "name": "No chemical cure available",
+          "ratio": "N/A",
+          "freq": "Remove infected plants immediately"
+        }
+      ],
+      "prevention": [
+        "Use virus-free certified seeds and transplants",
+        "Wash hands and disinfect tools with 1:9 bleach solution frequently",
+        "Control aphid populations which can spread the virus",
+        "Remove and bag infected plants — do not compost"
+      ],
+      "organic": true
     },
     "Tomato_leaf_yellow_virus": {
-      "display": "Tomato leaf yellow virus",
+      "display": "Tomato Yellow Leaf Curl Virus",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
+      "severity": "high",
+      "cause": "Caused by Tomato yellow leaf curl virus (TYLCV), transmitted exclusively by the silverleaf whitefly (Bemisia tabaci). Very difficult to control once established.",
+      "symptoms": "Severe upward curling and yellowing of leaf margins. Leaves become cupped and leathery. Severely stunted growth. Very low or zero fruit set if infection is early.",
+      "treatments": [
+        {
+          "name": "Imidacloprid (for whitefly vector)",
+          "ratio": "0.5ml per litre of water",
+          "freq": "Every 7–10 days"
+        },
+        {
+          "name": "Acetamiprid spray",
+          "ratio": "As per label",
+          "freq": "Alternate with imidacloprid to prevent resistance"
+        },
+        {
+          "name": "Yellow sticky traps",
+          "ratio": "20 traps per acre",
+          "freq": "Replace every 2 weeks"
+        }
+      ],
+      "prevention": [
+        "Plant resistant/tolerant varieties (e.g. Ty-1 gene varieties)",
+        "Use fine mesh netting (50-mesh) in nursery stage",
+        "Remove and destroy infected plants early",
+        "Apply reflective mulch to repel whiteflies"
+      ],
       "organic": false
     },
     "Tomato_mold_leaf": {
-      "display": "Tomato mold leaf",
+      "display": "Tomato Leaf Mold",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
+      "severity": "moderate",
+      "cause": "Caused by the fungus Passalora fulva (formerly Cladosporium fulvum). Thrives in high humidity (>85%) and moderate temperatures (20–25°C). Common in greenhouses.",
+      "symptoms": "Pale green to yellow patches on upper leaf surface. Corresponding olive-green to grayish-brown velvety fungal growth on leaf undersides. Lower leaves affected first.",
+      "treatments": [
+        {
+          "name": "Chlorothalonil",
+          "ratio": "2g per litre of water",
+          "freq": "Every 7–14 days"
+        },
+        {
+          "name": "Mancozeb spray",
+          "ratio": "2.5g per litre of water",
+          "freq": "Every 10 days"
+        },
+        {
+          "name": "Copper-based fungicide",
+          "ratio": "3g per litre of water",
+          "freq": "Weekly during humid weather"
+        }
+      ],
+      "prevention": [
+        "Reduce greenhouse humidity below 85% using ventilation",
+        "Avoid overhead watering",
+        "Plant resistant varieties",
+        "Remove infected leaves immediately"
+      ],
       "organic": false
     },
     "Tomato_two_spotted_spider_mites_leaf": {
-      "display": "Tomato two spotted spider mites leaf",
+      "display": "Tomato Spider Mites (Two-spotted)",
       "plant": "Tomato",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
-      "organic": false
+      "severity": "moderate",
+      "cause": "Caused by Tetranychus urticae (Two-spotted spider mite). Thrives in hot, dry conditions. Populations can explode rapidly.",
+      "symptoms": "Tiny yellow or white stippling dots on upper leaf surface caused by mites piercing and feeding on cells. Fine webbing visible on underside and between leaves. Leaves bronzen and curl.",
+      "treatments": [
+        {
+          "name": "Abamectin (Vertimec)",
+          "ratio": "0.5ml per litre of water",
+          "freq": "Every 7 days, max 2 applications"
+        },
+        {
+          "name": "Spiromesifen (Oberon)",
+          "ratio": "As per label",
+          "freq": "Every 14 days"
+        },
+        {
+          "name": "Neem oil spray (organic)",
+          "ratio": "5ml per litre of water",
+          "freq": "Every 5–7 days"
+        }
+      ],
+      "prevention": [
+        "Monitor undersides of leaves regularly with magnifying glass",
+        "Maintain adequate irrigation — drought stress worsens infestations",
+        "Introduce predatory mites (Phytoseiulus persimilis) as biocontrol",
+        "Avoid excessive nitrogen fertilization"
+      ],
+      "organic": true
     },
     "grape_leaf": {
-      "display": "grape leaf",
-      "plant": "grape",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
+      "display": "Grape Leaf (Healthy)",
+      "plant": "Grape",
+      "severity": "healthy",
+      "cause": "No disease detected. The grape leaf appears healthy.",
+      "symptoms": "Healthy grape leaves are bright green, symmetrically lobed, and free from spots, lesions, or discolouration.",
       "treatments": [],
-      "prevention": [],
-      "organic": false
+      "prevention": [
+        "Maintain regular pruning for air circulation",
+        "Monitor for early pest and disease signs",
+        "Ensure balanced fertilization — avoid excess nitrogen"
+      ],
+      "organic": true
     },
     "grape_leaf_black_rot": {
-      "display": "grape leaf black rot",
-      "plant": "grape",
-      "severity": "unknown",
-      "cause": "Class from PlantDoc dataset",
-      "symptoms": "N/A",
-      "treatments": [],
-      "prevention": [],
+      "display": "Grape Black Rot",
+      "plant": "Grape",
+      "severity": "high",
+      "cause": "Caused by the fungus Guignardia bidwellii. Spreads via rain splash from infected mummies (shrivelled fruit). Most severe during warm (24–29°C), wet spring weather.",
+      "symptoms": "Small, tan to brown circular lesions with dark brown borders on leaves. Black dot-like fruiting bodies (pycnidia) in lesion centres. Fruit shrivels into hard, black mummies.",
+      "treatments": [
+        {
+          "name": "Myclobutanil (Eagle)",
+          "ratio": "1ml per litre of water",
+          "freq": "Every 10–14 days from budbreak"
+        },
+        {
+          "name": "Mancozeb",
+          "ratio": "2.5g per litre of water",
+          "freq": "Every 7–10 days during critical period"
+        },
+        {
+          "name": "Captan spray",
+          "ratio": "2g per litre of water",
+          "freq": "Every 7–10 days, pre-bloom to berry set"
+        }
+      ],
+      "prevention": [
+        "Remove and destroy all mummified berries before budbreak",
+        "Prune to improve air circulation through the canopy",
+        "Apply protective fungicide sprays starting at budbreak",
+        "Train vines on a trellis system to reduce humidity"
+      ],
       "organic": false
     }
   }
