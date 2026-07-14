@@ -1,59 +1,40 @@
-"""
-model_service.py — Keras model inference wrapper for plant disease detection
-"""
 import os
 import json
 import numpy as np
 from PIL import Image
-import io
 import threading
 
-# Lazy-load TensorFlow to speed up startup
-_model = None
-_class_labels = None
+# Configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_FILENAME = "plant_disease_recog_model.tflite"
+RESOLVED_MODEL_PATH = os.path.join(BASE_DIR, MODEL_FILENAME)
+LABELS_PATH = os.path.join(BASE_DIR, "class_labels.json")
+
+# Global state
+_interpreter = None
 _model_lock = threading.Lock()
+labels_data = None
+NUM_CLASSES = 48
 
-# Look for model in same directory first (Hugging Face or moved), fallback to parent directory
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model.keras")
-if not os.path.exists(MODEL_PATH):
-    parent_path = os.path.join(os.path.dirname(__file__), "..", "plant_disease_recog_model.keras")
-    if os.path.exists(parent_path):
-        MODEL_PATH = parent_path
-
-# Global cache for the resolved model path (which might point to the Hugging Face hub cache)
-RESOLVED_MODEL_PATH = MODEL_PATH
-
-# TF 2.13 compatibility: suppress noisy warnings
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
-LABELS_PATH = os.path.join(os.path.dirname(__file__), "class_labels.json")
-
-def get_labels():
-    global _class_labels
-    if _class_labels is None:
+def load_labels():
+    global labels_data
+    if labels_data is None:
+        if not os.path.exists(LABELS_PATH):
+            raise FileNotFoundError(f"class_labels.json not found at {LABELS_PATH}")
         with open(LABELS_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        _class_labels = data
-    return _class_labels
+            labels_data = json.load(f)
 
 def check_and_download_model():
-    """Ensure the actual 770MB Keras model file is resolved, downloading it if it is missing or a Git LFS pointer."""
     global RESOLVED_MODEL_PATH
-    
-    needs_download = False
     if not os.path.exists(RESOLVED_MODEL_PATH):
-        needs_download = True
-    elif os.path.getsize(RESOLVED_MODEL_PATH) < 100000:
-        print(f"Model file at {RESOLVED_MODEL_PATH} is a Git LFS pointer ({os.path.getsize(RESOLVED_MODEL_PATH)} bytes).")
-        needs_download = True
-        
-    if needs_download:
+        print(f"Model not found locally at {RESOLVED_MODEL_PATH}.")
         print("Resolving model file via Hugging Face Hub download...")
         try:
             from huggingface_hub import hf_hub_download
             downloaded_path = hf_hub_download(
                 repo_id="pradipta2005/yieldsmart-api",
                 repo_type="space",
-                filename="plant_disease_recog_model.keras",
+                filename=MODEL_FILENAME,
                 token=os.environ.get("HF_TOKEN")
             )
             RESOLVED_MODEL_PATH = downloaded_path
@@ -62,7 +43,7 @@ def check_and_download_model():
         except Exception as hf_err:
             print("HF Hub download failed, falling back to direct URL download:", hf_err)
             
-        url = "https://github.com/pradipta2005/Yieldsmart/releases/download/model/plant_disease_recog_model.keras"
+        url = "https://github.com/pradipta2005/Yieldsmart/releases/download/model/plant_disease_recog_model.tflite"
         try:
             import requests
             response = requests.get(url, stream=True, timeout=60)
@@ -83,129 +64,98 @@ def check_and_download_model():
                 "Please place the model file manually in the backend directory."
             )
 
-def get_model():
-    global _model
+def get_interpreter():
+    global _interpreter
     with _model_lock:
-        if _model is None:
+        if _interpreter is None:
             check_and_download_model()
             import tensorflow as tf
-            print(f"Loading Keras model from {RESOLVED_MODEL_PATH}... (this may take a moment)")
-            _model = tf.keras.models.load_model(RESOLVED_MODEL_PATH)
-            print("Model loaded successfully.")
-        return _model
-
-
-# Number of valid plant disease classes
-NUM_CLASSES = 38
+            print(f"Loading TFLite model from {RESOLVED_MODEL_PATH}...")
+            _interpreter = tf.lite.Interpreter(model_path=RESOLVED_MODEL_PATH)
+            _interpreter.allocate_tensors()
+            print("TFLite Model loaded successfully.")
+        return _interpreter
 
 def compute_normalized_confidence(preds):
-    """
-    Convert sigmoid outputs to a relative probability distribution.
-    Reconstructs logits: logit = log(p / (1 - p)).
-    Applies softmax to the reconstructed logits to normalize.
-    """
-    eps = 1e-7
-    clipped_preds = np.clip(preds, eps, 1.0 - eps)
-    logits = np.log(clipped_preds / (1.0 - clipped_preds))
-    # Subtract max logit for numerical stability
-    exp_logits = np.exp(logits - np.max(logits))
-    return exp_logits / np.sum(exp_logits)
+    min_val = np.min(preds)
+    max_val = np.max(preds)
+    if max_val - min_val == 0:
+        return np.ones_like(preds) / len(preds)
+    normalized = (preds - min_val) / (max_val - min_val)
+    return normalized / np.sum(normalized)
 
-def preprocess_image(image_bytes: bytes) -> np.ndarray:
-    """Convert raw image bytes to a model-ready numpy array.
-    
-    Model: EfficientNetB7 fine-tuned on PlantVillage (38 classes).
-    Input: 160x160 RGB, pixel values in [0, 255] — EfficientNet handles
-    its own internal normalization (do NOT divide by 255 here).
-    """
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    image = image.resize((160, 160))
-    img_array = np.array(image, dtype=np.float32)  # Keep [0, 255] range
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+def is_green_dominant(img: Image.Image, threshold=0.15) -> bool:
+    img_hsv = img.convert("HSV")
+    np_img = np.array(img_hsv)
+    h_channel = np_img[:, :, 0]
+    s_channel = np_img[:, :, 1]
+    v_channel = np_img[:, :, 2]
+    green_mask = (h_channel >= 30) & (h_channel <= 90) & (s_channel >= 40) & (v_channel >= 40)
+    green_ratio = np.sum(green_mask) / (np_img.shape[0] * np_img.shape[1])
+    return green_ratio >= threshold
 
-def predict_disease(image_bytes: bytes) -> dict:
-    """
-    Run inference on an uploaded leaf image.
-    Returns the predicted class, confidence score, and full disease info.
-    
-    Note: The model output layer has 48 units (sigmoid) but only 38
-    correspond to valid plant disease classes. We slice to the first
-    NUM_CLASSES values before taking argmax to prevent IndexError.
-    """
-    # 1. Leaf presence detection pre-filter (HSV check)
+def predict_disease(image_bytes: bytes):
+    load_labels()
     try:
-        image = Image.open(io.BytesIO(image_bytes)).convert("HSV")
-        h, s, v = image.split()
-        h_arr, s_arr, v_arr = np.array(h), np.array(s), np.array(v)
-        # Plant hues: Green, Yellow, Orange, Brown (<=115) and Red (>=240)
-        # Exclude Blue, Cyan, Purple, Magenta (115 < Hue < 240)
-        # Ensure decent saturation (>25) and value (>20, <245) to ignore dark/white backgrounds
-        is_plant = ((h_arr <= 115) | (h_arr >= 240)) & (s_arr > 25) & (v_arr > 20) & (v_arr < 245)
-        plant_ratio = float(np.sum(is_plant) / is_plant.size)
-        if plant_ratio < 0.15:
-            raise ValueError("No plant leaf detected in the image. Please upload a clear photo of a plant leaf.")
+        img = Image.open(import_io_bytes(image_bytes))
+        if img.mode != "RGB":
+            img = img.convert("RGB")
     except Exception as e:
-        if isinstance(e, ValueError):
-            raise e
-        # Ignore other image parsing errors here; they will be caught by PIL in preprocess_image
-        pass
+        raise ValueError("Invalid image file.") from e
 
-    labels_data = get_labels()
-    class_list = labels_data["labels"]
-    solutions_db = labels_data["solutions"]
+    valid_leaf = is_green_dominant(img)
+    img_resized = img.resize((160, 160))
+    img_array = np.array(img_resized, dtype=np.float32)
+    img_array = np.expand_dims(img_array, axis=0)
 
-    model = get_model()
-    img_array = preprocess_image(image_bytes)
+    interpreter = get_interpreter()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
 
-    raw_predictions = model(img_array, training=False).numpy()
-    # Slice to valid class range only
-    predictions = raw_predictions[0][:NUM_CLASSES]
-
-    class_idx = int(np.argmax(predictions))
+    interpreter.set_tensor(input_details[0]['index'], img_array)
+    interpreter.invoke()
+    raw_predictions = interpreter.get_tensor(output_details[0]['index'])
     
-    # Calculate normalized relative probabilities (Softmax over reconstructed logits)
-    softmax_probs = compute_normalized_confidence(predictions)
-    confidence = float(softmax_probs[class_idx])
-
-    # Out-Of-Distribution (OOD) check: detect if image is a non-leaf or model is highly confused
-    # Condition 1: Multiple contradictory classes have high sigmoid activation (e.g. >0.7)
-    # Condition 2: Top relative confidence is extremely low (e.g. <0.30)
-    high_act_count = int(np.sum(predictions > 0.70))
-    is_valid_leaf = True
-    warning_msg = None
+    predictions = raw_predictions[0]
+    norm_preds = compute_normalized_confidence(predictions)
     
-    if high_act_count > 2 or confidence < 0.30:
-        is_valid_leaf = False
-        warning_msg = "The uploaded photo does not appear to be a clear, single leaf. Please upload a clear photo of a plant leaf under good lighting."
+    class_idx = int(np.argmax(norm_preds))
+    confidence_score = float(norm_preds[class_idx]) * 100
 
-    # Get top-3 predictions for UI display
-    top3_indices = np.argsort(predictions)[::-1][:3]
-    top3 = [
-        {
-            "label": class_list[int(i)],
-            "confidence": float(softmax_probs[int(i)])
-        }
-        for i in top3_indices
-    ]
-
-    predicted_label = class_list[class_idx]
-    disease_info = solutions_db.get(predicted_label, {
-        "display": predicted_label.replace("___", " — ").replace("_", " "),
-        "plant": "Unknown",
+    predicted_label = labels_data["labels"][class_idx]
+    disease_info = labels_data["solutions"].get(predicted_label, {
+        "display": predicted_label.replace("___", " ").replace("_", " "),
+        "plant": predicted_label.split("___")[0] if "___" in predicted_label else "Unknown",
         "severity": "unknown",
         "cause": "Information not available.",
-        "symptoms": "Please consult an agronomist.",
+        "symptoms": "N/A",
         "treatments": [],
         "prevention": [],
         "organic": False
     })
 
-    return {
+    top_3_indices = np.argsort(norm_preds)[-3:][::-1]
+    top_3 = []
+    for idx in top_3_indices:
+        lbl = labels_data["labels"][idx]
+        top_3.append({
+            "label": lbl,
+            "confidence": float(norm_preds[idx])
+        })
+
+    result = {
         "label": predicted_label,
-        "confidence": round(confidence * 100, 2),
-        "top3": top3,
+        "confidence": round(confidence_score, 2),
+        "top3": top_3,
         "disease_info": disease_info,
-        "is_valid_leaf": is_valid_leaf,
-        "warning": warning_msg
+        "is_valid_leaf": bool(valid_leaf)
     }
+
+    if not valid_leaf:
+        result["warning"] = "The uploaded photo does not appear to be a clear, single leaf. Please upload a clear photo of a plant leaf under good lighting."
+
+    return result
+
+def import_io_bytes(b):
+    import io
+    return io.BytesIO(b)
