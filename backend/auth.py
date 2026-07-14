@@ -40,21 +40,36 @@ def decode_token(token: str) -> Optional[dict]:
     except JWTError:
         return None
 
+from database import get_db, execute_query, IS_POSTGRES
+import sys
+
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
 def create_user(name: str, email: str, password: str, city: str) -> dict:
     initials = "".join(w[0].upper() for w in name.split()[:2])
     conn = get_db()
     try:
-        cursor = conn.execute(
-            "INSERT INTO users (name, email, password_hash, city, avatar_initials) VALUES (?, ?, ?, ?, ?)",
-            (name, email.lower().strip(), hash_password(password), city.strip(), initials)
-        )
+        if IS_POSTGRES:
+            cursor = execute_query(
+                conn,
+                "INSERT INTO users (name, email, password_hash, city, avatar_initials) VALUES (?, ?, ?, ?, ?) RETURNING id",
+                (name, email.lower().strip(), hash_password(password), city.strip(), initials)
+            )
+            row = cursor.fetchone()
+            user_id = row["id"]
+        else:
+            cursor = execute_query(
+                conn,
+                "INSERT INTO users (name, email, password_hash, city, avatar_initials) VALUES (?, ?, ?, ?, ?)",
+                (name, email.lower().strip(), hash_password(password), city.strip(), initials)
+            )
+            user_id = cursor.lastrowid
+            
         conn.commit()
-        return {"id": cursor.lastrowid, "name": name, "email": email.lower(), "city": city, "initials": initials}
+        return {"id": user_id, "name": name, "email": email.lower(), "city": city, "initials": initials}
     except Exception as e:
         conn.rollback()
-        if "UNIQUE constraint" in str(e):
+        if "UNIQUE constraint" in str(e) or "unique constraint" in str(e).lower():
             raise HTTPException(status_code=400, detail="An account with this email already exists.")
         print(f"[create_user ERROR] {type(e).__name__}: {e}")
         raise HTTPException(status_code=500, detail="Could not create account. Please try again.")
@@ -64,7 +79,8 @@ def create_user(name: str, email: str, password: str, city: str) -> dict:
 def authenticate_user(email: str, password: str) -> Optional[dict]:
     conn = get_db()
     try:
-        row = conn.execute(
+        row = execute_query(
+            conn,
             "SELECT id, name, email, city, password_hash, avatar_initials, created_at FROM users WHERE email = ?",
             (email.lower().strip(),)
         ).fetchone()
@@ -73,7 +89,7 @@ def authenticate_user(email: str, password: str) -> Optional[dict]:
         return {
             "id": row["id"], "name": row["name"], "email": row["email"],
             "city": row["city"], "initials": row["avatar_initials"],
-            "created_at": row["created_at"]
+            "created_at": str(row["created_at"])
         }
     finally:
         conn.close()
@@ -81,11 +97,18 @@ def authenticate_user(email: str, password: str) -> Optional[dict]:
 def get_user_by_id(user_id: int) -> Optional[dict]:
     conn = get_db()
     try:
-        row = conn.execute(
+        row = execute_query(
+            conn,
             "SELECT id, name, email, city, avatar_initials, created_at FROM users WHERE id = ?",
             (user_id,)
         ).fetchone()
-        return dict(row) if row else None
+        if not row:
+            return None
+        # Convert created_at to string in case it's a datetime object from Postgres
+        res = dict(row)
+        if "created_at" in res and res["created_at"] is not None:
+            res["created_at"] = str(res["created_at"])
+        return res
     finally:
         conn.close()
 
