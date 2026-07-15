@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiSignIn, apiSignUp } from "@/lib/api";
 import { saveAuth } from "@/lib/auth";
-import { Leaf, Mail, Lock, User, MapPin, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { Leaf, Mail, Lock, User, MapPin, ArrowRight, AlertCircle, Loader2, Navigation } from "lucide-react";
+import { getLocationWithLabel } from "@/lib/location";
+import { saveProfile } from "@/lib/profile";
 
 export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const resolvedParams = use(searchParams);
@@ -20,6 +22,7 @@ export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
     document.body.classList.remove("light-theme");
@@ -45,6 +48,27 @@ export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab
       else setError("Authentication failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLocateMe = async () => {
+    setIsLocating(true);
+    setError(null);
+    try {
+      const loc = await getLocationWithLabel();
+      setCity(loc.displayName);
+      saveProfile({
+        locationMode: "gps",
+        savedLat: loc.lat,
+        savedLon: loc.lon,
+        locationLabel: loc.displayName,
+        locationConfirmed: true,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError("Failed to get location");
+    } finally {
+      setIsLocating(false);
     }
   };
 
@@ -144,7 +168,7 @@ export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab
                 </div>
                 <div>
                   <label className="input-label">City / Location</label>
-                  <div className="input-wrap">
+                  <div className="input-wrap" style={{ position: "relative" }}>
                     <span className="input-icon-left"><MapPin size={16} /></span>
                     <input 
                       type="text" 
@@ -153,7 +177,32 @@ export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab
                       value={city} 
                       onChange={e => setCity(e.target.value)} 
                       required 
+                      style={{ paddingRight: "48px" }}
                     />
+                    <button
+                      type="button"
+                      onClick={handleLocateMe}
+                      disabled={isLocating}
+                      style={{
+                        position: "absolute",
+                        right: 8,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "var(--bg-secondary)",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "50%",
+                        width: 32,
+                        height: 32,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--accent-primary)",
+                        cursor: isLocating ? "not-allowed" : "pointer",
+                      }}
+                      title="Use my current location"
+                    >
+                      {isLocating ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Navigation size={14} />}
+                    </button>
                   </div>
                 </div>
               </>
