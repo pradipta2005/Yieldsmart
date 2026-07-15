@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
+import CameraCapture from "@/components/CameraCapture";
 import { apiDetect, DiseaseResult } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { UploadCloud, CheckCircle2, AlertTriangle, XCircle, Beaker, Shield, Activity, RefreshCw, ScanLine } from "lucide-react";
+import { UploadCloud, Camera, CheckCircle2, AlertTriangle, XCircle, Beaker, Shield, Activity, RefreshCw, ScanLine } from "lucide-react";
 
 const SEV_COLOR: Record<string, string> = {
   none: "var(--success)", moderate: "var(--warning)",
@@ -41,6 +42,7 @@ export default function DiseasePage() {
   const [drag, setDrag] = useState(false);
   const [step, setStep] = useState(0);
   const [isAuth, setIsAuth] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -73,6 +75,10 @@ export default function DiseasePage() {
 
   const reset = () => { setFile(null); setPreview(null); setResult(null); setError(null); setStep(0); setLoading(false); };
 
+  const handleCameraCapture = useCallback((f: File) => {
+    handleFile(f);
+  }, [handleFile]);
+
   if (!isAuth) return null;
   const sev = result?.disease_info.severity || "none";
   const sevColor = SEV_COLOR[sev];
@@ -80,6 +86,12 @@ export default function DiseasePage() {
   return (
     <>
       <Navbar />
+      {showCamera && (
+        <CameraCapture
+          onCapture={handleCameraCapture}
+          onClose={() => setShowCamera(false)}
+        />
+      )}
       <main className="app-page-container">
 
         {/* Header */}
@@ -115,9 +127,33 @@ export default function DiseasePage() {
                 <div style={{ color: "var(--text-tertiary)", fontSize: "0.875rem", marginBottom: 28, lineHeight: 1.6 }}>
                   Supports JPG and PNG · Up to 10 MB
                 </div>
-                <button className="btn btn-secondary" style={{ pointerEvents: "none" }}>
-                  Browse Files
-                </button>
+
+                {/* Action buttons row */}
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+                  {/* Browse files */}
+                  <button
+                    className="btn btn-secondary"
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <UploadCloud size={15} /> Browse Files
+                  </button>
+
+                  {/* Camera capture button */}
+                  <button
+                    className="btn"
+                    style={{
+                      pointerEvents: "auto",
+                      background: "rgba(16,185,129,0.1)",
+                      border: "1px solid rgba(16,185,129,0.25)",
+                      color: "var(--accent-primary)",
+                      fontWeight: 600,
+                    }}
+                    onClick={e => { e.stopPropagation(); setShowCamera(true); }}
+                  >
+                    <Camera size={15} /> Take Photo
+                  </button>
+                </div>
+
                 <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }}
                   onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
               </div>
