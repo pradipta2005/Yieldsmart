@@ -64,6 +64,35 @@ function Skeleton() {
   );
 }
 
+function isFocusMatch(cropName: string, focus: string): boolean {
+  if (!focus || focus === "Mixed / General") return false;
+  const c = cropName.toLowerCase();
+  const f = focus.toLowerCase();
+
+  if (f.includes("rice") || f.includes("paddy")) return c.includes("rice") || c.includes("paddy");
+  if (f.includes("wheat")) return c.includes("wheat");
+  if (f.includes("maize") || f.includes("corn")) return c.includes("maize") || c.includes("corn");
+  if (f.includes("cotton")) return c.includes("cotton");
+  if (f.includes("sugarcane")) return c.includes("sugarcane");
+  if (f.includes("vegetables")) {
+    const veggies = ["tomato", "potato", "chili", "brinjal", "okra", "onion", "cabbage", "cauliflower", "spinach", "carrot", "radish", "pea", "cucumber", "beans"];
+    return veggies.some(v => c.includes(v)) || c.includes("vegetable");
+  }
+  if (f.includes("fruits")) {
+    const fruits = ["apple", "mango", "banana", "orange", "guava", "papaya", "pomegranate", "grape", "lemon", "lime"];
+    return fruits.some(fr => c.includes(fr)) || c.includes("fruit");
+  }
+  if (f.includes("pulses") || f.includes("lentils")) {
+    const pulses = ["lentil", "gram", "pea", "bean", "pigeonpea", "cowpea", "moong", "urad"];
+    return pulses.some(p => c.includes(p)) || c.includes("pulse") || c.includes("legume");
+  }
+  if (f.includes("oilseeds")) {
+    const oil = ["mustard", "groundnut", "soybean", "sunflower", "sesame", "linseed", "castor"];
+    return oil.some(o => c.includes(o)) || c.includes("oilseed");
+  }
+  return false;
+}
+
 const WIND_DIRS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
 const windDir = (deg: number) => WIND_DIRS[Math.round(deg / 45) % 8];
 
@@ -482,60 +511,76 @@ export default function DashboardPage() {
 
                 {data.crops.length > 0 ? (
                   <div className="dashboard-crop-grid">
-                    {data.crops.map((c, i) => (
-                      <div
-                        key={c.name}
-                        className="crop-recommendation-card"
-                        style={{
-                          padding: "24px", borderRadius: 16,
-                          border: "1px solid var(--border-subtle)",
-                          background: "var(--bg-secondary)",
-                          transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.25s, box-shadow 0.25s",
-                          cursor: "default",
-                          position: "relative", overflow: "hidden",
-                        }}
-                        onMouseOver={e => {
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.35)";
-                          (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 30px rgba(0,0,0,0.4)";
-                        }}
-                        onMouseOut={e => {
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--border-subtle)";
-                          (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                        }}
-                      >
-                        {/* Match rank badge for top crop */}
-                        {i === 0 && (
-                          <div style={{ position: "absolute", top: 16, right: 16, fontSize: "0.55rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em", padding: "2px 8px", borderRadius: 4, background: "rgba(212,175,55,0.08)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}>
-                            Top Pick
-                          </div>
-                        )}
+                    {(() => {
+                      const sorted = [...data.crops].sort((a, b) => {
+                        const aMatch = isFocusMatch(a.name, cropFocus);
+                        const bMatch = isFocusMatch(b.name, cropFocus);
+                        if (aMatch && !bMatch) return -1;
+                        if (!aMatch && bMatch) return 1;
+                        return b.score - a.score;
+                      });
+                      return sorted.map((c, i) => {
+                        const matched = isFocusMatch(c.name, cropFocus);
+                        return (
+                          <div
+                            key={c.name}
+                            className="crop-recommendation-card"
+                            style={{
+                              padding: "24px", borderRadius: 16,
+                              border: "1px solid var(--border-subtle)",
+                              background: "var(--bg-secondary)",
+                              transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.25s, box-shadow 0.25s",
+                              cursor: "default",
+                              position: "relative", overflow: "hidden",
+                            }}
+                            onMouseOver={e => {
+                              (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+                              (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.35)";
+                              (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 30px rgba(0,0,0,0.4)";
+                            }}
+                            onMouseOut={e => {
+                              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                              (e.currentTarget as HTMLElement).style.borderColor = "var(--border-subtle)";
+                              (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                            }}
+                          >
+                            {/* Match rank badge */}
+                            {matched ? (
+                              <div style={{ position: "absolute", top: 16, right: 16, fontSize: "0.55rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em", padding: "2px 8px", borderRadius: 4, background: "rgba(16,185,129,0.08)", color: "var(--accent-primary)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                                Focus Match
+                              </div>
+                            ) : i === 0 ? (
+                              <div style={{ position: "absolute", top: 16, right: 16, fontSize: "0.55rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em", padding: "2px 8px", borderRadius: 4, background: "rgba(212,175,55,0.08)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}>
+                                Top Pick
+                              </div>
+                            ) : null}
 
-                        <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 20 }}>
-                          <div style={{
-                            width: 44, height: 44, borderRadius: "50%",
-                            background: "var(--bg-tertiary)", border: "1px solid var(--border-subtle)",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: "1.5rem", lineHeight: 1
-                          }}>
-                            {c.emoji}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: "1.1rem", fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>{c.name}</div>
-                            <div style={{ fontSize: "0.7rem", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 1 }}>{c.soil_type}</div>
-                          </div>
-                        </div>
+                            <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 20 }}>
+                              <div style={{
+                                width: 44, height: 44, borderRadius: "50%",
+                                background: "var(--bg-tertiary)", border: "1px solid var(--border-subtle)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: "1.5rem", lineHeight: 1
+                              }}>
+                                {c.emoji}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: "1.1rem", fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>{c.name}</div>
+                                <div style={{ fontSize: "0.7rem", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 1 }}>{c.soil_type}</div>
+                              </div>
+                            </div>
 
-                        {/* Monospace Tech Match indicator */}
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-tertiary)", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-subtle)", marginBottom: 18 }}>
-                          <span style={{ fontSize: "0.65rem", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>MATCH INDEX</span>
-                          <span style={{ fontWeight: 600, fontSize: "0.85rem", color: sev(c.score), fontFamily: "var(--font-mono)" }}>//{c.score}.00%</span>
-                        </div>
+                            {/* Monospace Tech Match indicator */}
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-tertiary)", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-subtle)", marginBottom: 18 }}>
+                              <span style={{ fontSize: "0.65rem", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>MATCH INDEX</span>
+                              <span style={{ fontWeight: 600, fontSize: "0.85rem", color: sev(c.score), fontFamily: "var(--font-mono)" }}>//{c.score}.00%</span>
+                            </div>
 
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{c.tip}&rdquo;</div>
-                      </div>
-                    ))}
+                            <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{c.tip}&rdquo;</div>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "56px 0", gap: 14, textAlign: "center" }}>
