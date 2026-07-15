@@ -67,6 +67,193 @@ function Skeleton() {
   );
 }
 
+/* ─── Creative Smart Farm Desk Clock ────────────────────────── */
+function FarmDeskClock({ temp }: { temp?: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const saved = localStorage.getItem("ys_clock_expanded");
+    if (saved !== null) {
+      setExpanded(saved === "true");
+    }
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const toggleExpanded = () => {
+    const next = !expanded;
+    setExpanded(next);
+    localStorage.setItem("ys_clock_expanded", String(next));
+  };
+
+  const hours = time.getHours();
+  const minutes = time.getMinutes().toString().padStart(2, "0");
+  const isPm = hours >= 12;
+  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+  
+  let periodLabel = "Daytime";
+  let sunColor = "#ffd200";
+  let showMoon = false;
+
+  if (hours >= 5 && hours < 8) {
+    periodLabel = "Sunrise";
+    sunColor = "#ffb26b";
+  } else if (hours >= 8 && hours < 17) {
+    periodLabel = "Daytime";
+    sunColor = "#ffe600";
+  } else if (hours >= 17 && hours < 19) {
+    periodLabel = "Sunset";
+    sunColor = "#ea580c";
+  } else {
+    periodLabel = "Night";
+    sunColor = "#fef08a";
+    showMoon = true;
+  }
+
+  const weekday = time.toLocaleDateString("en-US", { weekday: "short" });
+  const tempStr = temp !== undefined ? `${Math.round(temp)}°C` : "--°C";
+
+  if (!expanded) {
+    return (
+      <div 
+        onClick={toggleExpanded}
+        className="premium-input"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "7px 14px",
+          borderRadius: 99,
+          cursor: "pointer",
+          fontSize: "0.78rem",
+          fontWeight: 600,
+          color: "var(--text-secondary)",
+          userSelect: "none",
+          border: "1px solid var(--border-subtle)",
+          background: "var(--bg-secondary)",
+          boxShadow: "var(--shadow-sm)",
+          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "var(--accent-primary)";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "var(--border-subtle)";
+          e.currentTarget.style.transform = "translateY(0)";
+        }}
+      >
+        <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--accent-primary)", animation: "pulse 2s infinite" }} />
+        <span>🕒 {displayHours}:{minutes} {isPm ? "PM" : "AM"}</span>
+        <span style={{ color: "var(--text-tertiary)", fontWeight: 400 }}>· {tempStr}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      onClick={toggleExpanded}
+      style={{
+        position: "relative",
+        width: 130,
+        height: 125,
+        cursor: "pointer",
+        userSelect: "none",
+        transition: "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+        filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.18))",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "scale(1.05) translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1) translateY(0)";
+      }}
+    >
+      <svg width="100%" height="100%" viewBox="0 0 140 135" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path 
+          d="M70,12 C102,12 125,92 125,106 C125,120 106,125 70,125 C34,125 15,120 15,106 C15,92 38,12 70,12 Z" 
+          fill="var(--bg-elevated)" 
+          stroke="var(--border-subtle)" 
+          strokeWidth="1.5"
+        />
+        <path 
+          d="M70,17 C98,17 119,90 119,102 C119,114 102,118 70,118 C38,118 21,114 21,102 C21,90 42,17 70,17 Z" 
+          fill="#0c0e0c" 
+        />
+        <defs>
+          <linearGradient id="skyGradDynamic" x1="0" y1="0" x2="0" y2="1">
+            {hours >= 5 && hours < 8 ? (
+              <>
+                <stop offset="0%" stopColor="#1e3a8a" />
+                <stop offset="60%" stopColor="#f97316" />
+                <stop offset="100%" stopColor="#fef08a" />
+              </>
+            ) : hours >= 8 && hours < 17 ? (
+              <>
+                <stop offset="0%" stopColor="#0284c7" />
+                <stop offset="100%" stopColor="#38bdf8" />
+              </>
+            ) : hours >= 17 && hours < 19 ? (
+              <>
+                <stop offset="0%" stopColor="#311042" />
+                <stop offset="60%" stopColor="#ea580c" />
+                <stop offset="100%" stopColor="#facc15" />
+              </>
+            ) : (
+              <>
+                <stop offset="0%" stopColor="#030712" />
+                <stop offset="70%" stopColor="#111827" />
+                <stop offset="100%" stopColor="#1f2937" />
+              </>
+            )}
+          </linearGradient>
+        </defs>
+        <path 
+          d="M70,20 C95,20 115,88 115,99 C115,110 99,114 70,114 C41,114 25,110 25,99 C25,88 45,20 70,20 Z" 
+          fill="url(#skyGradDynamic)" 
+        />
+        {showMoon ? (
+          <circle cx="70" cy="90" r="16" fill="#fef3c7" opacity="0.15" />
+        ) : (
+          <circle cx="70" cy="98" r="22" fill={sunColor} opacity="0.25" />
+        )}
+      </svg>
+      <div style={{
+        position: "absolute",
+        top: 22,
+        left: 20,
+        right: 20,
+        bottom: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#ffffff",
+        textAlign: "center",
+        zIndex: 2,
+        fontFamily: "var(--font-sans)",
+        pointerEvents: "none"
+      }}>
+        {showMoon && <div style={{ position: "absolute", top: 12, left: 18, fontSize: "0.45rem", opacity: 0.7, animation: "pulse 3s infinite" }}>✦</div>}
+        {showMoon && <div style={{ position: "absolute", top: 8, right: 20, fontSize: "0.38rem", opacity: 0.5, animation: "pulse 2s infinite 1s" }}>✦</div>}
+        <div style={{ fontSize: "1.35rem", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
+          {displayHours}
+          <span style={{ animation: "pulse 1s infinite", margin: "0 1px", display: "inline-block" }}>:</span>
+          {minutes}
+        </div>
+        <div style={{ fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: showMoon ? "#95a5a6" : "#ffffff", marginTop: 2, textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}>
+          {periodLabel}
+        </div>
+        <div style={{ fontSize: "0.55rem", fontWeight: 500, opacity: 0.85, marginTop: 5, letterSpacing: "0.02em", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}>
+          {weekday} · {tempStr}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function isFocusMatch(cropName: string, focus: string): boolean {
   if (!focus || focus === "Mixed / General") return false;
   const c = cropName.toLowerCase();
@@ -258,6 +445,7 @@ export default function DashboardPage() {
                   <span style={{ fontSize: "0.82rem", fontWeight: 700, textTransform: "capitalize", color: "var(--text-primary)" }}>{data.season}</span>
                 </div>
               )}
+              <FarmDeskClock temp={data?.weather?.temp} />
               <button onClick={handleRefresh} disabled={refreshing} style={{
                 display: "flex", alignItems: "center", gap: 7, padding: "8px 18px", borderRadius: 99,
                 background: "var(--bg-secondary)", border: "1px solid var(--border-subtle)",
