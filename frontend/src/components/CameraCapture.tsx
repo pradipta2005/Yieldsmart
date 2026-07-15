@@ -11,6 +11,7 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const capturedUrlRef = useRef<string | null>(null); // track for cleanup
 
   const [mode, setMode] = useState<"live" | "preview">("live");
   const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
@@ -19,7 +20,14 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [starting, setStarting] = useState(true);
-  const [scanning, setScanning] = useState(false);
+
+  /* ── helpers ─────────────────────────────────────────────────── */
+  const revokePreview = () => {
+    if (capturedUrlRef.current) {
+      URL.revokeObjectURL(capturedUrlRef.current);
+      capturedUrlRef.current = null;
+    }
+  };
 
   const startCamera = useCallback(async (facing: "environment" | "user") => {
     // Stop any existing stream
@@ -46,24 +54,26 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
     }
   }, []);
 
+  // Mount — start camera, unmount — release stream + url
   useEffect(() => {
     startCamera(facingMode);
     return () => {
       streamRef.current?.getTracks().forEach(t => t.stop());
+      revokePreview();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const flipCamera = useCallback(() => {
-    const next = facingMode === "environment" ? "user" : "environment";
+  const flipCamera = useCallback((currentFacing: "environment" | "user") => {
+    const next = currentFacing === "environment" ? "user" : "environment";
     setFacingMode(next);
     startCamera(next);
-  }, [facingMode, startCamera]);
+  }, [startCamera]);
 
-  const capture = useCallback(() => {
+  const capture = useCallback((currentFacing: "environment" | "user") => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas || video.videoWidth === 0) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -72,31 +82,36 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
 
     // Flash effect
     setFlash(true);
-    setScanning(true);
     setTimeout(() => setFlash(false), 200);
 
+    // Mirror the canvas if using front camera (so saved image matches preview)
+    if (currentFacing === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0);
 
     canvas.toBlob(blob => {
       if (!blob) return;
       const file = new File([blob], `leaf-scan-${Date.now()}.jpg`, { type: "image/jpeg" });
+      revokePreview();
       const url = URL.createObjectURL(blob);
+      capturedUrlRef.current = url;
       setCapturedFile(file);
       setCapturedUrl(url);
       setMode("preview");
-      setScanning(false);
-
       // Stop camera stream after capture
       streamRef.current?.getTracks().forEach(t => t.stop());
     }, "image/jpeg", 0.92);
   }, []);
 
-  const retake = useCallback(() => {
+  const retake = useCallback((currentFacing: "environment" | "user") => {
+    revokePreview();
     setCapturedUrl(null);
     setCapturedFile(null);
     setMode("live");
-    startCamera(facingMode);
-  }, [facingMode, startCamera]);
+    startCamera(currentFacing);
+  }, [startCamera]);
 
   const confirm = useCallback(() => {
     if (capturedFile) {
@@ -115,7 +130,7 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1000,
-      background: "rgba(0,0,0,0.95)",
+      background: "#000",
       display: "flex", flexDirection: "column",
       animation: "cameraModalIn 0.25s cubic-bezier(0.16,1,0.3,1)",
     }}>
@@ -123,54 +138,56 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
       {flash && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 10,
-          background: "rgba(255,255,255,0.7)",
+          background: "rgba(255,255,255,0.75)",
           pointerEvents: "none",
+          transition: "opacity 0.15s",
         }} />
       )}
 
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px 24px",
-        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
+        padding: "14px 20px",
+        background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         zIndex: 5, flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
             width: 32, height: 32, borderRadius: "50%",
-            background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)",
+            background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <Camera size={16} color="var(--accent-primary)" />
+            <Camera size={15} color="#10b981" />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>Live Camera</div>
-            <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", marginTop: 1 }}>
-              {mode === "live" ? "Point at the affected leaf" : "Review your capture"}
+            <div style={{ fontWeight: 700, fontSize: "0.9rem", color: "#fff" }}>Live Camera</div>
+            <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.38)", marginTop: 1 }}>
+              {mode === "live" ? "Point at the affected leaf · tap shutter to capture" : "Review — retake or proceed to analysis"}
             </div>
           </div>
         </div>
         <button
           onClick={onClose}
+          aria-label="Close camera"
           style={{
-            width: 36, height: 36, borderRadius: "50%",
+            width: 34, height: 34, borderRadius: "50%",
             background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", color: "rgba(255,255,255,0.6)",
+            cursor: "pointer", color: "rgba(255,255,255,0.55)",
             transition: "all 0.15s",
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.15)"; (e.currentTarget as HTMLElement).style.color = "#ef4444"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.6)"; }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.18)"; (e.currentTarget as HTMLElement).style.color = "#ef4444"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}
         >
-          <X size={16} />
+          <X size={15} />
         </button>
       </div>
 
-      {/* Viewfinder area */}
-      <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      {/* Viewfinder */}
+      <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", background: "#000" }}>
 
-        {/* Live video */}
+        {/* ── Live mode ── */}
         {mode === "live" && (
           <>
             <video
@@ -179,92 +196,94 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
               playsInline
               muted
               style={{
+                position: "absolute", inset: 0,
                 width: "100%", height: "100%",
                 objectFit: "cover",
                 display: starting ? "none" : "block",
+                // Mirror CSS only for selfie — actual capture ctx.scale corrects it
                 transform: facingMode === "user" ? "scaleX(-1)" : "none",
               }}
             />
+
+            {/* Loading spinner */}
             {starting && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, color: "rgba(255,255,255,0.5)" }}>
-                <div className="spinner" style={{ width: 36, height: 36, borderColor: "rgba(255,255,255,0.1)", borderTopColor: "var(--accent-primary)" }} />
-                <span style={{ fontSize: "0.875rem" }}>Starting camera…</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, color: "rgba(255,255,255,0.45)" }}>
+                <div className="spinner" style={{ width: 38, height: 38, borderColor: "rgba(255,255,255,0.08)", borderTopColor: "#10b981" }} />
+                <span style={{ fontSize: "0.82rem", letterSpacing: "0.04em" }}>Starting camera…</span>
               </div>
             )}
+
+            {/* Permission error */}
             {error && (
               <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
-                padding: "32px", textAlign: "center", maxWidth: 340,
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+                padding: "32px 24px", textAlign: "center", maxWidth: 320,
               }}>
-                <ZapOff size={40} color="rgba(239,68,68,0.6)" />
-                <div style={{ color: "#ef4444", fontWeight: 600, fontSize: "0.95rem" }}>Camera Unavailable</div>
-                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.82rem", lineHeight: 1.6 }}>{error}</div>
-                <button
-                  onClick={() => startCamera(facingMode)}
-                  className="btn btn-secondary"
-                  style={{ marginTop: 8 }}
-                >
+                <ZapOff size={44} color="rgba(239,68,68,0.55)" />
+                <div style={{ color: "#ef4444", fontWeight: 700, fontSize: "0.9rem" }}>Camera Unavailable</div>
+                <div style={{ color: "rgba(255,255,255,0.38)", fontSize: "0.8rem", lineHeight: 1.65 }}>{error}</div>
+                <button onClick={() => startCamera(facingMode)} className="btn btn-secondary" style={{ marginTop: 6 }}>
                   Try Again
                 </button>
               </div>
             )}
 
-            {/* Scan-line animation overlay */}
+            {/* Overlay: viewfinder brackets + scan line */}
             {!starting && !error && (
               <>
-                {/* Corner viewfinder brackets */}
                 <div style={{ position: "absolute", inset: 0, pointerEvents: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <div style={{ position: "relative", width: "min(85%, 420px)", aspectRatio: "4/3" }}>
-                    {/* corners */}
+                  <div style={{ position: "relative", width: "min(88%, 440px)", aspectRatio: "4/3" }}>
+                    {/* Corner brackets */}
                     {[
-                      { top: 0, left: 0, borderTop: "2px solid var(--accent-primary)", borderLeft: "2px solid var(--accent-primary)", borderTopLeftRadius: 4 },
-                      { top: 0, right: 0, borderTop: "2px solid var(--accent-primary)", borderRight: "2px solid var(--accent-primary)", borderTopRightRadius: 4 },
-                      { bottom: 0, left: 0, borderBottom: "2px solid var(--accent-primary)", borderLeft: "2px solid var(--accent-primary)", borderBottomLeftRadius: 4 },
-                      { bottom: 0, right: 0, borderBottom: "2px solid var(--accent-primary)", borderRight: "2px solid var(--accent-primary)", borderBottomRightRadius: 4 },
-                    ].map((style, i) => (
-                      <div key={i} style={{ position: "absolute", width: 28, height: 28, ...style }} />
+                      { top: 0, left: 0, borderTop: "2.5px solid #10b981", borderLeft: "2.5px solid #10b981", borderTopLeftRadius: 5 },
+                      { top: 0, right: 0, borderTop: "2.5px solid #10b981", borderRight: "2.5px solid #10b981", borderTopRightRadius: 5 },
+                      { bottom: 0, left: 0, borderBottom: "2.5px solid #10b981", borderLeft: "2.5px solid #10b981", borderBottomLeftRadius: 5 },
+                      { bottom: 0, right: 0, borderBottom: "2.5px solid #10b981", borderRight: "2.5px solid #10b981", borderBottomRightRadius: 5 },
+                    ].map((s, i) => (
+                      <div key={i} style={{ position: "absolute", width: 30, height: 30, ...s }} />
                     ))}
 
-                    {/* Scan line */}
+                    {/* Animated scan line */}
                     <div style={{
-                      position: "absolute", left: 0, right: 0, height: 1,
-                      background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.8), transparent)",
-                      animation: "scanLine 2.2s ease-in-out infinite",
-                      boxShadow: "0 0 8px rgba(16,185,129,0.5)",
+                      position: "absolute", left: 4, right: 4, height: 1.5,
+                      background: "linear-gradient(90deg, transparent 0%, #10b981 40%, #6ee7b7 50%, #10b981 60%, transparent 100%)",
+                      animation: "scanLine 2s ease-in-out infinite",
+                      boxShadow: "0 0 10px rgba(16,185,129,0.6)",
+                      borderRadius: 2,
                     }} />
 
-                    {/* Center label */}
+                    {/* Hint label */}
                     <div style={{
-                      position: "absolute", bottom: -32, left: 0, right: 0,
-                      textAlign: "center", fontSize: "0.72rem", fontWeight: 500,
-                      color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                      position: "absolute", bottom: -30, left: 0, right: 0,
+                      textAlign: "center", fontSize: "0.68rem", fontWeight: 500,
+                      color: "rgba(255,255,255,0.42)", letterSpacing: "0.09em", textTransform: "uppercase",
                     }}>
-                      <Scan size={11} style={{ display: "inline", marginRight: 5, verticalAlign: "middle" }} />
+                      <Scan size={10} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} />
                       Align leaf within frame
                     </div>
                   </div>
                 </div>
 
-                {/* Dimmed border vignette */}
+                {/* Vignette */}
                 <div style={{
                   position: "absolute", inset: 0, pointerEvents: "none",
-                  background: "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%)",
+                  background: "radial-gradient(ellipse at center, transparent 42%, rgba(0,0,0,0.5) 100%)",
                 }} />
               </>
             )}
           </>
         )}
 
-        {/* Preview captured image */}
+        {/* ── Preview mode ── */}
         {mode === "preview" && capturedUrl && (
           <img
             src={capturedUrl}
             alt="Captured leaf"
             style={{
-              width: "100%", height: "100%",
+              maxWidth: "100%",
+              maxHeight: "100%",
               objectFit: "contain",
-              background: "#000",
+              display: "block",
             }}
           />
         )}
@@ -273,74 +292,72 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
       {/* Hidden canvas */}
       <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      {/* Controls */}
+      {/* Controls bar */}
       <div style={{
-        padding: "24px 32px 32px",
-        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
+        padding: "20px 28px 28px",
+        background: "rgba(0,0,0,0.75)", backdropFilter: "blur(14px)",
         borderTop: "1px solid rgba(255,255,255,0.06)",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 20,
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 24,
         flexShrink: 0,
       }}>
         {mode === "live" ? (
           <>
             {/* Flip camera */}
             <button
-              onClick={flipCamera}
+              onClick={() => flipCamera(facingMode)}
               disabled={starting || !!error}
-              title="Flip camera"
+              aria-label="Flip camera"
               style={{
-                width: 48, height: 48, borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)",
+                width: 50, height: 50, borderRadius: "50%",
+                background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.12)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", color: "rgba(255,255,255,0.6)",
-                transition: "all 0.2s",
+                cursor: starting || !!error ? "not-allowed" : "pointer",
+                color: "rgba(255,255,255,0.65)",
+                transition: "all 0.18s",
+                opacity: starting || !!error ? 0.4 : 1,
               }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.14)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"}
+              onMouseEnter={e => { if (!starting && !error) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.16)"; }}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.09)"}
             >
               <FlipHorizontal size={20} />
             </button>
 
-            {/* Shutter button */}
+            {/* Shutter */}
             <button
-              onClick={capture}
-              disabled={starting || !!error || scanning}
-              title="Capture photo"
+              onClick={() => capture(facingMode)}
+              disabled={starting || !!error}
+              aria-label="Capture photo"
               style={{
-                width: 72, height: 72, borderRadius: "50%",
+                width: 74, height: 74, borderRadius: "50%",
                 background: "#fff",
-                border: "4px solid rgba(255,255,255,0.15)",
-                boxShadow: "0 0 0 2px rgba(16,185,129,0.5), 0 8px 30px rgba(0,0,0,0.5)",
+                border: "4px solid rgba(255,255,255,0.18)",
+                boxShadow: "0 0 0 3px rgba(16,185,129,0.55), 0 8px 32px rgba(0,0,0,0.6)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: starting || !!error ? "not-allowed" : "pointer",
-                transition: "transform 0.12s, box-shadow 0.12s",
-                opacity: starting || !!error ? 0.4 : 1,
+                transition: "transform 0.12s ease, box-shadow 0.12s ease",
+                opacity: starting || !!error ? 0.35 : 1,
               }}
-              onMouseEnter={e => { if (!starting && !error) (e.currentTarget as HTMLElement).style.transform = "scale(1.07)"; }}
+              onMouseEnter={e => { if (!starting && !error) { (e.currentTarget as HTMLElement).style.transform = "scale(1.06)"; } }}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = "scale(1)"}
-              onMouseDown={e => (e.currentTarget as HTMLElement).style.transform = "scale(0.93)"}
+              onMouseDown={e => { if (!starting && !error) (e.currentTarget as HTMLElement).style.transform = "scale(0.92)"; }}
               onMouseUp={e => (e.currentTarget as HTMLElement).style.transform = "scale(1)"}
             >
-              <div style={{
-                width: 52, height: 52, borderRadius: "50%",
-                background: "#fff",
-                border: "2px solid rgba(0,0,0,0.08)",
-              }} />
+              <div style={{ width: 54, height: 54, borderRadius: "50%", background: "#fff", border: "2px solid rgba(0,0,0,0.07)" }} />
             </button>
 
-            {/* Close placeholder for symmetry */}
+            {/* Cancel */}
             <button
               onClick={onClose}
-              title="Cancel"
+              aria-label="Cancel"
               style={{
-                width: 48, height: 48, borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)",
+                width: 50, height: 50, borderRadius: "50%",
+                background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.12)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", color: "rgba(255,255,255,0.6)",
-                transition: "all 0.2s",
+                cursor: "pointer", color: "rgba(255,255,255,0.65)",
+                transition: "all 0.18s",
               }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.15)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.18)"; (e.currentTarget as HTMLElement).style.color = "#ef4444"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.09)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)"; }}
             >
               <X size={20} />
             </button>
@@ -349,25 +366,28 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
           /* Preview controls */
           <>
             <button
-              onClick={retake}
+              onClick={() => retake(facingMode)}
               className="btn btn-secondary"
-              style={{ padding: "12px 28px", borderRadius: 99, fontSize: "0.875rem", display: "flex", alignItems: "center", gap: 8 }}
+              style={{ padding: "12px 30px", borderRadius: 99, fontSize: "0.875rem", display: "flex", alignItems: "center", gap: 8 }}
             >
-              <RefreshCw size={16} /> Retake
+              <RefreshCw size={15} /> Retake
             </button>
             <button
               onClick={confirm}
+              aria-label="Use this photo for analysis"
               style={{
-                padding: "14px 40px", borderRadius: 99, fontSize: "0.9rem", fontWeight: 600,
-                background: "var(--accent-primary)", color: "#000",
-                border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-                boxShadow: "0 4px 20px rgba(16,185,129,0.35)",
-                transition: "all 0.15s",
+                padding: "13px 36px", borderRadius: 99, fontSize: "0.875rem", fontWeight: 700,
+                background: "#10b981", color: "#000",
+                border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 8,
+                boxShadow: "0 4px 22px rgba(16,185,129,0.4)",
+                transition: "transform 0.13s, box-shadow 0.13s",
+                letterSpacing: "-0.01em",
               }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = "scale(1.03)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = "scale(1)"}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.03)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 28px rgba(16,185,129,0.55)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 22px rgba(16,185,129,0.4)"; }}
             >
-              <Scan size={17} /> Use this Photo
+              <Scan size={16} /> Use this Photo
             </button>
           </>
         )}
@@ -375,13 +395,13 @@ export default function CameraCapture({ onCapture, onClose }: CameraCaptureProps
 
       <style>{`
         @keyframes cameraModalIn {
-          from { opacity: 0; transform: scale(0.97); }
+          from { opacity: 0; transform: scale(0.96); }
           to   { opacity: 1; transform: scale(1); }
         }
         @keyframes scanLine {
-          0%   { top: 0%; }
-          50%  { top: calc(100% - 1px); }
-          100% { top: 0%; }
+          0%   { top: 2%; }
+          50%  { top: calc(98% - 1px); }
+          100% { top: 2%; }
         }
       `}</style>
     </div>
