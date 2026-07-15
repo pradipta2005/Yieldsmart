@@ -18,12 +18,15 @@ function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     let start = 0;
-    const step = to / 40;
+    const duration = 250; // Snappy 250ms total animation duration
+    const steps = 12;
+    const step = to / steps;
+    const interval = duration / steps;
     const timer = setInterval(() => {
       start += step;
       if (start >= to) { setVal(to); clearInterval(timer); }
       else setVal(Math.floor(start));
-    }, 18);
+    }, interval);
     return () => clearInterval(timer);
   }, [to]);
   return <>{val}{suffix}</>;
@@ -32,7 +35,7 @@ function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
 /* ─── Smooth animated progress bar ────────────────────────── */
 function Bar({ value, color, height = 5 }: { value: number; color: string; height?: number }) {
   const [w, setW] = useState(0);
-  useEffect(() => { const t = setTimeout(() => setW(value), 500); return () => clearTimeout(t); }, [value]);
+  useEffect(() => { const t = setTimeout(() => setW(value), 100); return () => clearTimeout(t); }, [value]);
   return (
     <div style={{ height, background: "rgba(255,255,255,0.05)", borderRadius: 99, overflow: "hidden", position: "relative" }}>
       <div style={{
