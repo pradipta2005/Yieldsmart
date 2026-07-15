@@ -207,7 +207,10 @@ export default function DashboardPage() {
   return (
     <>
       <Navbar />
-      <main className="app-page-container">
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className="premium-mesh-glow-1" />
+        <div className="premium-mesh-glow-2" />
+        <main className="app-page-container" style={{ position: "relative", zIndex: 1 }}>
 
         {/* ══════ PAGE HEADER ══════════════════════════════════════ */}
         {user && (
@@ -627,6 +630,7 @@ export default function DashboardPage() {
         })()}
 
       </main>
+    </div>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

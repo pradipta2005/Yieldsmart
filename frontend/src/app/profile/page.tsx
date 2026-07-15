@@ -56,10 +56,10 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const INPUT_STYLE: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
-  background: "var(--bg-tertiary)", border: "1px solid var(--border-subtle)",
-  borderRadius: 10, padding: "10px 14px",
+  background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)",
+  borderRadius: 12, padding: "12px 16px",
   fontSize: "0.875rem", color: "var(--text-primary)",
-  outline: "none", transition: "border-color 0.15s",
+  outline: "none", transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
   fontFamily: "inherit",
 };
 
@@ -142,7 +142,10 @@ export default function ProfilePage() {
   return (
     <>
       <Navbar />
-      <main className="app-page-container" style={{ maxWidth: 720 }}>
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className="premium-mesh-glow-1" />
+        <div className="premium-mesh-glow-2" />
+        <main className="app-page-container" style={{ maxWidth: 720, position: "relative", zIndex: 1 }}>
 
         {/* ── Header ── */}
         <div style={{ marginBottom: 32 }}>
@@ -430,6 +433,7 @@ export default function ProfilePage() {
         </div>
 
       </main>
+    </div>
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
