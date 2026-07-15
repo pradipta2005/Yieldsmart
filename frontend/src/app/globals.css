@@ -1338,10 +1338,44 @@ body.light-theme select option {
   box-shadow: 0 0 0 3px var(--accent-muted) !important;
 }
 
+/* ── Google Translate: suppress default chrome ──────────────────────
+   We load the Google Translate script but render a fully custom
+   premium language selector (LanguageToggle.tsx). The native
+   Google widget iframe/bar must be hidden so it doesn't clash
+   with our design system.
+────────────────────────────────────────────────────────────────── */
 
+/* Hide the top Google bar that pushes content down */
+.goog-te-banner-frame,
+.skiptranslate > iframe {
+  display: none !important;
+  height: 0 !important;
+}
 
+body {
+  top: 0 !important;
+}
 
+/* Hide the branding inserted next to selected text */
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
 
+/* Suppress the Google Translate selector widget (we use our own) */
+#google_translate_element {
+  display: none !important;
+}
+
+/* Translated page: Google sometimes adds a border/outline to elements */
+.goog-te-combo {
+  font-family: inherit !important;
+}
+
+/* Prevent translated text color from being forced-overridden */
+font[color] {
+  color: inherit !important;
+}
 
 
 

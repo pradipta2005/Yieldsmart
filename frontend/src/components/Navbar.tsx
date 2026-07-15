@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getUser, clearAuth } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 import { Leaf, LayoutDashboard, ScanLine, History, LogOut, MapPin, ChevronDown, Sun, Moon, UserCircle, Navigation } from "lucide-react";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -130,6 +131,9 @@ export default function Navbar() {
         >
           {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
         </button>
+
+        {/* Language Toggle */}
+        <LanguageToggle />
 
         {/* User dropdown */}
         <div style={{ position: "relative" }}>
