@@ -144,9 +144,9 @@ export default function DashboardPage() {
     const p = getProfile();
     setFarmName(p.farmName || "");
     setCropFocus(p.cropFocus || "");
-    if (p.locationMode === "gps" && p.locationLabel) {
+    if (p.locationLabel) {
       setLocationLabel(p.locationLabel);
-      setIsGPS(true);
+      setIsGPS(p.locationMode === "gps");
     } else if (u?.city) {
       setLocationLabel(u.city);
       setIsGPS(false);

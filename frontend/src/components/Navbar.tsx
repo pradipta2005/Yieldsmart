@@ -22,9 +22,9 @@ export default function Navbar() {
 
     // Load profile for location badge
     const p = getProfile();
-    if (p.locationMode === "gps" && p.locationLabel) {
+    if (p.locationLabel) {
       setLocationLabel(p.locationLabel);
-      setIsGPS(true);
+      setIsGPS(p.locationMode === "gps");
     } else if (u?.city) {
       setLocationLabel(u.city);
       setIsGPS(false);
@@ -51,9 +51,9 @@ export default function Navbar() {
     if (!menuOpen) {
       const p = getProfile();
       const u = getUser();
-      if (p.locationMode === "gps" && p.locationLabel) {
+      if (p.locationLabel) {
         setLocationLabel(p.locationLabel);
-        setIsGPS(true);
+        setIsGPS(p.locationMode === "gps");
       } else if (u?.city) {
         setLocationLabel(u.city);
         setIsGPS(false);
