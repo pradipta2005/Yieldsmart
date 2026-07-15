@@ -117,6 +117,26 @@ export default function Home() {
 
   return (
     <div style={{ position: "relative", background: "var(--bg-primary)" }}>
+      {/* ═══ SEO STRUCTURED DATA ═════════════════════════════════════ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "YieldSmart",
+            "url": "https://yieldsmart.vercel.app",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "All",
+            "description": "AI-powered farming dashboard providing yield forecasts, plant disease detection, and hyper-local weather.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          })
+        }}
+      />
 
       {/* ═══ PREMIUM FIXED NAVBAR ════════════════════════════════════════ */}
       <nav className={`landing-nav ${scrolled ? "scrolled" : ""}`}>
