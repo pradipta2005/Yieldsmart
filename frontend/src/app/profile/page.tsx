@@ -20,7 +20,7 @@ function SectionCard({
   icon, title, children,
 }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="app-card" style={{ marginBottom: 20 }}>
+    <div className="app-card premium-glass-card app-card-accent-emerald" style={{ marginBottom: 20 }}>
       <div style={{
         display: "flex", alignItems: "center", gap: 10, marginBottom: 24,
         paddingBottom: 16, borderBottom: "1px solid var(--border-subtle)",

@@ -294,25 +294,28 @@ export default function DashboardPage() {
                   { icon: <Droplets size={14} />, label: "Humidity", value: data.weather.humidity, suffix: "%", sub: "Relative humidity", color: "#34D399" },
                   { icon: <Wind size={14} />, label: "Wind Speed", value: data.weather.wind_speed, suffix: " km/h", sub: windDir(data.weather.wind_deg), color: "#A78BFA" },
                   { icon: <Droplet size={14} />, label: "Soil Moisture", value: data.soil.moisture_pct, suffix: "%", sub: data.soil.moisture_level, color: "#FBBF24" },
-                ].map((kpi, i) => (
-                  <div key={i} className="kpi-card" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-subtle)", borderRadius: 18, padding: 20 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                      <span style={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-tertiary)" }}>{kpi.label}</span>
-                      <div style={{ color: kpi.color, display: "flex", alignItems: "center", opacity: 0.8 }}>{kpi.icon}</div>
+                ].map((kpi, i) => {
+                  const accentClass = i === 0 ? "app-card-accent-blue" : i === 1 ? "app-card-accent-emerald" : i === 2 ? "app-card-accent-blue" : "app-card-accent-yellow";
+                  return (
+                    <div key={i} className={`kpi-card premium-glass-card ${accentClass}`} style={{ padding: 20 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                        <span style={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-tertiary)" }}>{kpi.label}</span>
+                        <div style={{ color: kpi.color, display: "flex", alignItems: "center", opacity: 0.8 }}>{kpi.icon}</div>
+                      </div>
+                      <div className="premium-metric-value" style={{ lineHeight: 1, marginBottom: 8 }}>
+                        <CountUp to={kpi.value} suffix={kpi.suffix} />
+                      </div>
+                      <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", textTransform: "capitalize", fontWeight: 500 }}>{kpi.sub}</div>
                     </div>
-                    <div style={{ fontSize: "1.85rem", fontWeight: 600, letterSpacing: "-0.02em", fontFamily: "var(--font-mono)", color: kpi.color, lineHeight: 1, marginBottom: 8 }}>
-                      <CountUp to={kpi.value} suffix={kpi.suffix} />
-                    </div>
-                    <div style={{ fontSize: "0.72rem", color: "var(--text-tertiary)", textTransform: "capitalize", fontWeight: 500 }}>{kpi.sub}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* ══ ROW 1 — WEATHER + SOIL ═════════════════════════════ */}
               <div className="dashboard-main-grid">
 
                 {/* ── Weather ─── */}
-                <div className="app-card">
+                <div className="app-card premium-glass-card app-card-accent-blue">
                   {/* Decorative circle */}
                   <div style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
 
@@ -367,7 +370,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* ── Soil Intelligence ─── */}
-                <div className="app-card" style={{ display: "flex", flexDirection: "column" }}>
+                <div className="app-card premium-glass-card app-card-accent-emerald" style={{ display: "flex", flexDirection: "column" }}>
                   <div style={{ position: "absolute", bottom: -40, left: -40, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
 
                   <Tag label="Soil Intelligence" color="var(--accent-primary)" />
@@ -427,7 +430,7 @@ export default function DashboardPage() {
               <div className="dashboard-two-col-grid">
 
                 {/* ── Alerts ─── */}
-                <div className="app-card">
+                <div className={`app-card premium-glass-card ${data.alerts.some(a => a.type === "danger") ? "app-card-accent-red" : data.alerts.length > 0 ? "app-card-accent-yellow" : "app-card-accent-emerald"}`}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
                     <div>
                       <Tag label="Farm Alerts" color={data.alerts.some(a => a.type === "danger") ? "var(--danger)" : data.alerts.some(a => a.type === "warning") ? "var(--warning)" : "var(--success)"} />
@@ -469,7 +472,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* ── Irrigation ─── */}
-                <div className="app-card">
+                <div className="app-card premium-glass-card app-card-accent-blue">
                   <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
 
                   <Tag label="Water Management" color="#60A5FA" />
@@ -499,7 +502,7 @@ export default function DashboardPage() {
               </div>
 
               {/* ══ ROW 3 — CROPS ════════════════════════════════════════ */}
-              <div className="app-card">
+              <div className="app-card premium-glass-card app-card-accent-emerald">
                 <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 500, height: 200, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
