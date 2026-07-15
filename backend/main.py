@@ -108,9 +108,9 @@ def me(current_user: dict = Depends(get_current_user)):
 
 @app.get("/api/dashboard")
 def dashboard(
-    city: str = Query(default=None),
-    lat: float = Query(default=None),
-    lon: float = Query(default=None),
+    city: str | None = Query(default=None),
+    lat: float | None = Query(default=None),
+    lon: float | None = Query(default=None),
     current_user: dict = Depends(get_optional_user)
 ):
     """Full dashboard data. Accepts city name OR lat/lon coordinates for GPS accuracy."""
