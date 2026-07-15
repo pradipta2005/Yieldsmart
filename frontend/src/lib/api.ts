@@ -13,7 +13,17 @@ async function req<T>(url: string, options?: RequestInit, retries = 3, delay = 1
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
-      throw new Error(err.detail || `Request failed: ${res.status}`);
+      let msg = `Request failed: ${res.status}`;
+      if (err && err.detail) {
+        if (typeof err.detail === "string") {
+          msg = err.detail;
+        } else if (Array.isArray(err.detail)) {
+          msg = err.detail.map((d: any) => d.msg || JSON.stringify(d)).join(", ");
+        } else if (typeof err.detail === "object") {
+          msg = err.detail.message || JSON.stringify(err.detail);
+        }
+      }
+      throw new Error(msg);
     }
     return res.json();
   } catch (error) {
@@ -71,12 +81,13 @@ export interface DashboardData {
   forecast: ForecastDay[]; season: string;
 }
 export const apiDashboard = (city: string, lat?: number | null, lon?: number | null) => {
-  // Use GPS coordinates when available for accurate rural weather data
+  // Always include city as a fallback query parameter for backward compatibility with older backends
   if (lat != null && lon != null) {
-    return req<DashboardData>(`/api/dashboard?lat=${lat}&lon=${lon}`);
+    return req<DashboardData>(`/api/dashboard?lat=${lat}&lon=${lon}&city=${encodeURIComponent(city)}`);
   }
   return req<DashboardData>(`/api/dashboard?city=${encodeURIComponent(city)}`);
 };
+
 
 // ── Disease ───────────────────────────────────────────────────────────────────
 export interface Treatment { method: string; ratio: string; frequency: string; }

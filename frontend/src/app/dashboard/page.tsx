@@ -165,7 +165,9 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     const p = getProfile();
-    const city = (p.locationMode === "gps" && p.locationLabel) ? p.locationLabel : user.city;
+    const city = (p.locationMode === "gps" && p.locationLabel)
+      ? p.locationLabel.split(",")[0].trim()
+      : user.city;
     const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
     const lon = (p.locationMode === "gps" && p.savedLon) ? p.savedLon : null;
     load(city, lat, lon);
@@ -177,7 +179,9 @@ export default function DashboardPage() {
     if (refreshing) return;
     setRefreshing(true);
     const p = getProfile();
-    const city = (p.locationMode === "gps" && p.locationLabel) ? p.locationLabel : (user?.city || "");
+    const city = (p.locationMode === "gps" && p.locationLabel)
+      ? p.locationLabel.split(",")[0].trim()
+      : (user?.city || "");
     const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
     const lon = (p.locationMode === "gps" && p.savedLon) ? p.savedLon : null;
     try { setData(await apiDashboard(city, lat, lon)); }
