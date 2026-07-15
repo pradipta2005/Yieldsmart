@@ -10,7 +10,7 @@ import {
   Leaf, AlertTriangle, Droplet, Clock, CheckCircle2, XCircle,
   RefreshCw, ArrowRight, Zap, TrendingUp, Info,
   Sun, CloudSnow, CloudLightning, CloudDrizzle, CloudFog, CloudRain,
-  Navigation, MapPin
+  Navigation, MapPin, Sprout
 } from "lucide-react";
 
 /* ─── Animated number counter ─────────────────────────────── */
@@ -824,6 +824,31 @@ export default function DashboardPage() {
         })()}
 
       </main>
+      
+      {/* ─── Floating Action Button for New Prediction ──────────── */}
+      <a href="/predict" style={{
+        position: "fixed",
+        bottom: 32,
+        right: 32,
+        background: "var(--accent-primary)",
+        color: "var(--bg-primary)",
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 8px 32px rgba(210,245,71,0.3)",
+        zIndex: 50,
+        textDecoration: "none",
+        transition: "transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+      }}
+      onMouseOver={e => (e.currentTarget.style.transform = "scale(1.05)")}
+      onMouseOut={e => (e.currentTarget.style.transform = "scale(1)")}
+      title="New Yield Forecast"
+      >
+        <Sprout size={24} color="var(--bg-primary)" />
+      </a>
     </div>
 
       <style>{`

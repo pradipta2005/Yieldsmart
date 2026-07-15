@@ -1,0 +1,16 @@
+{
+  "name": "YieldSmart — Smart Farming",
+  "short_name": "YieldSmart",
+  "description": "Smart farming platform for crop recommendations and disease detection.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#060806",
+  "theme_color": "#060806",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

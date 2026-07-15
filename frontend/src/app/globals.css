@@ -1250,6 +1250,35 @@ body.light-theme .premium-glass-card {
   border-radius: 24px !important;
 }
 
+/* Low-end device / performance fallbacks */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .premium-glass-card {
+    backdrop-filter: none !important;
+    background: var(--bg-secondary) !important;
+  }
+
+  body.light-theme .premium-glass-card {
+    backdrop-filter: none !important;
+    background: var(--bg-secondary) !important;
+  }
+}
+
+@supports not (backdrop-filter: blur(16px)) {
+  .premium-glass-card {
+    background: var(--bg-secondary) !important;
+  }
+  body.light-theme .premium-glass-card {
+    background: var(--bg-secondary) !important;
+  }
+}
+
 /* ── Elegant Card Side Accents (Pinterest Inspired) ─────────────── */
 .app-card-accent-emerald {
   border-left: 4px solid var(--accent-primary) !important;

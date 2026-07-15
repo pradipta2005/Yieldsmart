@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   description:
     "AI-powered farming dashboard with real-time weather intelligence, soil analytics, crop recommendations, and plant disease detection.",
   keywords: "farming, agriculture, plant disease, weather, soil, crop recommendation, AI",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
