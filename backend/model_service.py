@@ -26,8 +26,15 @@ def load_labels():
 
 def check_and_download_model():
     global RESOLVED_MODEL_PATH
+    needs_download = False
     if not os.path.exists(RESOLVED_MODEL_PATH):
-        print(f"Model not found locally at {RESOLVED_MODEL_PATH}.")
+        needs_download = True
+    elif os.path.getsize(RESOLVED_MODEL_PATH) < 100000:
+        print(f"Model file at {RESOLVED_MODEL_PATH} is a Git LFS pointer ({os.path.getsize(RESOLVED_MODEL_PATH)} bytes).")
+        needs_download = True
+
+    if needs_download:
+        print(f"Model file not found or is a Git LFS pointer at {RESOLVED_MODEL_PATH}.")
         print("Resolving model file via Hugging Face Hub download...")
         try:
             from huggingface_hub import hf_hub_download
