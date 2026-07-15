@@ -1,3 +1,14 @@
+---
+title: Yieldsmart Api
+emoji: 🌱
+colorFrom: green
+colorTo: green
+sdk: gradio
+sdk_version: 5.12.0
+app_file: app.py
+pinned: false
+---
+
 # YieldSmart 🌱 — Smart Farming Platform
 
 [![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
