@@ -5,7 +5,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { apiDetect, DiseaseResult } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { UploadCloud, CheckCircle2, AlertTriangle, XCircle, Beaker, Shield, Activity, RefreshCw, ScanLine, Leaf } from "lucide-react";
+import { UploadCloud, CheckCircle2, AlertTriangle, XCircle, Beaker, Shield, Activity, RefreshCw, ScanLine } from "lucide-react";
 
 const SEV_COLOR: Record<string, string> = {
   none: "var(--success)", moderate: "var(--warning)",
@@ -89,7 +89,7 @@ export default function DiseasePage() {
             Plant Disease Scanner
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", maxWidth: 520, lineHeight: 1.6 }}>
-            Upload a clear photo of a leaf. Our neural network identifies the disease across 48 plant types and prescribes a treatment plan.
+            Upload a clear photo of a leaf. Our AI identifies the disease and gives you a detailed treatment plan with easy-to-follow prevention steps.
           </p>
         </div>
 
@@ -197,10 +197,6 @@ export default function DiseasePage() {
                       <div style={{ fontSize: "1.5rem", fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", marginBottom: 6 }}>
                         {result.disease_info.display}
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <Leaf size={13} color="var(--text-tertiary)" />
-                        <span style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>{result.disease_info.plant}</span>
-                      </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
                       <span style={{
@@ -299,11 +295,14 @@ export default function DiseasePage() {
                     </div>
                     {result.top3.map((p, i) => {
                       const pct = Math.round(p.confidence * 100);
+                      // Strip plant name prefix: "Apple___Black_rot" → "Black rot"
+                      const rawLabel = p.label.includes("___") ? p.label.split("___")[1] : p.label;
+                      const displayLabel = rawLabel.replace(/_/g, " ");
                       return (
                         <div key={p.label} style={{ marginBottom: 14 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                             <span style={{ fontSize: "0.82rem", color: i === 0 ? "var(--text-primary)" : "var(--text-secondary)" }}>
-                              {p.label.replace(/___/g, " — ").replace(/_/g, " ")}
+                              {displayLabel}
                             </span>
                             <span style={{ fontSize: "0.82rem", fontWeight: 600, fontFamily: "var(--font-mono)", color: i === 0 ? sevColor : "var(--text-tertiary)" }}>{pct}%</span>
                           </div>

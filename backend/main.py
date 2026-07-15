@@ -162,7 +162,7 @@ async def detect_disease(
             info = result["disease_info"]
             save_scan(
                 user_id=current_user["id"],
-                plant=info.get("plant", "Unknown"),
+                plant="Leaf Scan",
                 disease=info.get("display", result["label"]),
                 severity=info.get("severity", "unknown"),
                 confidence=result["confidence"],

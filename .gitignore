@@ -1,29 +1,73 @@
-# Python
+# ==============================================================================
+# YieldSmart — Comprehensive Git Ignore Rules
+# ==============================================================================
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python Caches & Environments
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
-.venv
+*.py[cod]
+*$py.class
+*.so
+.Python
 env/
 venv/
+.venv/
+ENV/
+*.manifest
+*.spec
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
 yieldsmart.db
-*.h5
+backend/yieldsmart.db
 
-
-# Node / Next.js
-node_modules/
-.next/
-out/
-build/
+# Environment Config & Secrets
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+backend/.env
+frontend/.env.local
 
-# Temp directories
-tmp*/
+# Node.js & Frontend dependencies/builds
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+frontend/.next/
+frontend/out/
+frontend/build/
 
+# Model training/weights (exclude huge Keras model binaries from git)
+*.h5
+*.keras
+!model/plant_disease_recog_model.tflite
+
+# Local IDEs & Temporary folders
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+tmp/
+temp/
 # Local deployment helpers
 backend/spaces.py
 
+C:\Users\ADMIN\.gemini\antigravity-ide\
+C:/Users/ADMIN/.gemini/antigravity-ide/
+.gemini/

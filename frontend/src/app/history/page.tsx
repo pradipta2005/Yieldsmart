@@ -129,7 +129,7 @@ export default function HistoryPage() {
 
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 600, fontSize: "0.9375rem", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text-primary)" }}>{item.disease}</div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Plant: {item.plant}</div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)" }}>{formatDate(item.scanned_at)}</div>
                       </div>
 
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
@@ -205,7 +205,6 @@ export default function HistoryPage() {
                 </button>
                 <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-tertiary)", marginBottom: 10 }}>Saved Diagnosis</div>
                 <div style={{ fontSize: "1.5rem", fontWeight: 700, fontFamily: "var(--font-display)", marginBottom: 6, color: "var(--text-primary)" }}>{info?.display || selectedScan.disease}</div>
-                <div style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>Plant: {info?.plant || selectedScan.plant}</div>
 
                 <div style={{ position: "absolute", bottom: 24, right: 28, textAlign: "right" }}>
                   <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", padding: "3px 8px", borderRadius: 4, background: sevColor + "12", color: sevColor, border: `1px solid ${sevColor}25`, marginBottom: 8, display: "inline-block" }}>

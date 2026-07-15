@@ -23,7 +23,7 @@ except ImportError:
     sys.modules["keras.src.models.functional"] = keras.models
     print("Mapped to keras.models")
 
-model_path = os.path.join(os.path.dirname(__file__), "plant_disease_recog_model.keras")
+model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "backend", "plant_disease_recog_model.keras")
 
 try:
     model = tf.keras.models.load_model(model_path)

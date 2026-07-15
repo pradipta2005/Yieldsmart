@@ -11,7 +11,7 @@ GREEN  = "\033[92m"; RED = "\033[91m"; YELLOW = "\033[93m"
 CYAN   = "\033[96m"; BOLD = "\033[1m"; RESET  = "\033[0m"
 
 BASE   = "http://localhost:8000"
-LABELS = os.path.join(os.path.dirname(__file__), "class_labels.json")
+LABELS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "backend", "class_labels.json")
 
 with open(LABELS, encoding="utf-8") as f:
     data = json.load(f)

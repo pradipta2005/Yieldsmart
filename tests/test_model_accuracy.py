@@ -23,7 +23,7 @@ CYAN   = "\033[96m"; BOLD = "\033[1m"; RESET  = "\033[0m"
 API_URL = "http://localhost:8000/api/detect-disease"
 
 # ── Load class list ───────────────────────────────────────────────────────────
-LABELS_PATH = os.path.join(os.path.dirname(__file__), "class_labels.json")
+LABELS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "backend", "class_labels.json")
 with open(LABELS_PATH, encoding="utf-8") as f:
     labels_data = json.load(f)
 ALL_LABELS = labels_data["labels"]          # 38 classes

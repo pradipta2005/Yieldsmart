@@ -76,7 +76,7 @@ export const apiDashboard = (city: string) =>
 // ── Disease ───────────────────────────────────────────────────────────────────
 export interface Treatment { method: string; ratio: string; frequency: string; }
 export interface DiseaseInfo {
-  display: string; plant: string; severity: "none"|"moderate"|"severe"|"critical";
+  display: string; severity: "none"|"moderate"|"severe"|"critical";
   cause: string; symptoms: string; treatments: Treatment[];
   prevention: string[]; organic: boolean;
 }

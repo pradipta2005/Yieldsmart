@@ -34,33 +34,16 @@ def check_and_download_model():
             downloaded_path = hf_hub_download(
                 repo_id="pradipta2005/yieldsmart-api",
                 repo_type="space",
-                filename=MODEL_FILENAME,
+                filename="backend/" + MODEL_FILENAME,
                 token=os.environ.get("HF_TOKEN")
             )
             RESOLVED_MODEL_PATH = downloaded_path
             print("Model resolved successfully via HF Hub:", RESOLVED_MODEL_PATH)
             return
         except Exception as hf_err:
-            print("HF Hub download failed, falling back to direct URL download:", hf_err)
-            
-        url = "https://github.com/pradipta2005/Yieldsmart/releases/download/model/plant_disease_recog_model.tflite"
-        try:
-            import requests
-            response = requests.get(url, stream=True, timeout=60)
-            response.raise_for_status()
-            
-            temp_path = RESOLVED_MODEL_PATH + ".tmp"
-            with open(temp_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-            os.replace(temp_path, RESOLVED_MODEL_PATH)
-            print("Download complete. Model saved successfully.")
-        except Exception as e:
-            if os.path.exists(RESOLVED_MODEL_PATH + ".tmp"):
-                os.remove(RESOLVED_MODEL_PATH + ".tmp")
+            print("HF Hub download failed:", hf_err)
             raise FileNotFoundError(
-                f"Model file not found at {RESOLVED_MODEL_PATH} and auto-download failed: {e}. "
+                f"Model file not found at {RESOLVED_MODEL_PATH} and auto-download failed: {hf_err}. "
                 "Please place the model file manually in the backend directory."
             )
 
@@ -130,7 +113,6 @@ def predict_disease(image_bytes: bytes):
     predicted_label = labels_data["labels"][class_idx]
     disease_info = labels_data["solutions"].get(predicted_label, {
         "display": predicted_label.replace("___", " ").replace("_", " "),
-        "plant": predicted_label.split("___")[0] if "___" in predicted_label else "Unknown",
         "severity": "unknown",
         "cause": "Information not available.",
         "symptoms": "N/A",
@@ -143,8 +125,10 @@ def predict_disease(image_bytes: bytes):
     top_3 = []
     for idx in top_3_indices:
         lbl = labels_data["labels"][idx]
+        display_lbl = labels_data["solutions"].get(lbl, {}).get("display", lbl)
         top_3.append({
             "label": lbl,
+            "display": display_lbl,
             "confidence": float(norm_preds[idx])
         })
 
