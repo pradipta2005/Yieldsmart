@@ -50,123 +50,160 @@ export default function AuthPage({ searchParams }: { searchParams: Promise<{ tab
 
   return (
     <div className="auth-container">
-      <Link href="/" style={{ position: 'absolute', top: 32, left: 32, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Leaf size={24} color="var(--accent-primary)" />
-        <span style={{ fontWeight: 600, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-          YieldSmart
-        </span>
-      </Link>
+      {/* ── Left Illustration Sidebar (Hidden on Mobile) ── */}
+      <div className="auth-sidebar">
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="brand-logo-container">
+            <Leaf size={16} color="var(--accent-primary)" />
+          </div>
+          <span className="brand-text">YieldSmart</span>
+        </Link>
 
-      <div className="auth-box">
-        <div style={{ marginBottom: 32, textAlign: 'center' }}>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: 8 }}>{isSignIn ? "Welcome back" : "Create an account"}</h1>
-          <p className="text-muted" style={{ fontSize: '0.875rem' }}>
-            {isSignIn ? "Enter your details to access your dashboard." : "Start managing your farm intelligently."}
+        <div style={{ paddingRight: 40, marginTop: "auto", marginBottom: "auto" }}>
+          <div className="premium-pill-badge" style={{ background: "var(--accent-muted)", color: "var(--accent-primary)", border: "1px solid rgba(210,245,71,0.18)", marginBottom: 20 }}>
+            🌾 Smart Agriculture
+          </div>
+          <h2 style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 800, letterSpacing: "-0.04em", fontFamily: "var(--font-display)", lineHeight: 1.15, marginBottom: 20 }}>
+            Precision field analytics.<br />
+            Optimal <span style={{ color: "var(--accent-primary)" }}>crop yields</span>.
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6, maxWidth: 400 }}>
+            Every seed deserves precision weather, water, and soil diagnostics. Welcome to the next level of smart farming.
           </p>
         </div>
 
-        <div className="auth-tabs">
-          <button 
-            className={`auth-tab ${isSignIn ? 'active' : ''}`} 
-            onClick={() => { setIsSignIn(true); setError(null); }}
-            style={{ flex: 1 }}
-          >
-            Sign In
-          </button>
-          <button 
-            className={`auth-tab ${!isSignIn ? 'active' : ''}`} 
-            onClick={() => { setIsSignIn(false); setError(null); }}
-            style={{ flex: 1 }}
-          >
-            Sign Up
-          </button>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-tertiary)" }}>
+          <span>© 2026 YieldSmart Inc.</span>
+          <span>Farmer-First Platform</span>
         </div>
+      </div>
 
-        {error && (
-          <div className="alert alert-danger" style={{ marginBottom: 24, padding: '12px' }}>
-            <AlertCircle size={16} />
-            <span style={{ fontSize: '0.8125rem' }}>{error}</span>
+      {/* ── Right Form Pane ── */}
+      <div className="auth-form-pane">
+        <div className="premium-mesh-glow-1" style={{ opacity: 0.5 }} />
+        <div className="premium-mesh-glow-2" style={{ opacity: 0.5 }} />
+
+        {/* Small floating logo for mobile layout */}
+        <Link href="/" style={{ position: "absolute", top: 24, left: 24, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }} className="mobile-only-logo">
+          <Leaf size={20} color="var(--accent-primary)" />
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
+            YieldSmart
+          </span>
+        </Link>
+
+        <div className="auth-box">
+          <div style={{ marginBottom: 28, textAlign: 'center' }}>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: "-0.03em", color: "var(--text-primary)", marginBottom: 8 }}>
+              {isSignIn ? "Welcome back" : "Create account"}
+            </h1>
+            <p style={{ fontSize: '0.82rem', color: "var(--text-secondary)" }}>
+              {isSignIn ? "Enter your credentials to access your dashboard" : "Start managing your farm intelligently"}
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {!isSignIn && (
-            <>
-              <div>
-                <label className="input-label">Full Name</label>
-                <div className="input-wrap">
-                  <span className="input-icon-left"><User size={16} /></span>
-                  <input 
-                    type="text" 
-                    className="input input-with-icon" 
-                    placeholder="John Doe" 
-                    value={name} 
-                    onChange={e => setName(e.target.value)} 
-                    required 
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="input-label">City / Location</label>
-                <div className="input-wrap">
-                  <span className="input-icon-left"><MapPin size={16} /></span>
-                  <input 
-                    type="text" 
-                    className="input input-with-icon" 
-                    placeholder="New Delhi" 
-                    value={city} 
-                    onChange={e => setCity(e.target.value)} 
-                    required 
-                  />
-                </div>
-              </div>
-            </>
+          <div className="auth-tabs">
+            <button 
+              className={`auth-tab ${isSignIn ? 'active' : ''}`} 
+              onClick={() => { setIsSignIn(true); setError(null); }}
+              style={{ flex: 1 }}
+            >
+              Sign In
+            </button>
+            <button 
+              className={`auth-tab ${!isSignIn ? 'active' : ''}`} 
+              onClick={() => { setIsSignIn(false); setError(null); }}
+              style={{ flex: 1 }}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger" style={{ marginBottom: 24, padding: '12px' }}>
+              <AlertCircle size={16} />
+              <span style={{ fontSize: '0.8125rem' }}>{error}</span>
+            </div>
           )}
 
-          <div>
-            <label className="input-label">Email Address</label>
-            <div className="input-wrap">
-              <span className="input-icon-left"><Mail size={16} /></span>
-              <input 
-                type="email" 
-                className="input input-with-icon" 
-                placeholder="you@example.com" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-              />
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {!isSignIn && (
+              <>
+                <div>
+                  <label className="input-label">Full Name</label>
+                  <div className="input-wrap">
+                    <span className="input-icon-left"><User size={16} /></span>
+                    <input 
+                      type="text" 
+                      className="input input-with-icon premium-input" 
+                      placeholder="John Doe" 
+                      value={name} 
+                      onChange={e => setName(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="input-label">City / Location</label>
+                  <div className="input-wrap">
+                    <span className="input-icon-left"><MapPin size={16} /></span>
+                    <input 
+                      type="text" 
+                      className="input input-with-icon premium-input" 
+                      placeholder="New Delhi" 
+                      value={city} 
+                      onChange={e => setCity(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className="input-label">Email Address</label>
+              <div className="input-wrap">
+                <span className="input-icon-left"><Mail size={16} /></span>
+                <input 
+                  type="email" 
+                  className="input input-with-icon premium-input" 
+                  placeholder="you@example.com" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required 
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="input-label">Password</label>
-            <div className="input-wrap">
-              <span className="input-icon-left"><Lock size={16} /></span>
-              <input 
-                type="password" 
-                className="input input-with-icon" 
-                placeholder="••••••••" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                minLength={6}
-              />
+            <div>
+              <label className="input-label">Password</label>
+              <div className="input-wrap">
+                <span className="input-icon-left"><Lock size={16} /></span>
+                <input 
+                  type="password" 
+                  className="input input-with-icon premium-input" 
+                  placeholder="••••••••" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  required 
+                  minLength={6}
+                />
+              </div>
             </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', marginTop: 8, padding: '12px', borderRadius: 99, background: "var(--accent-primary)", color: "var(--bg-primary)", fontWeight: 700 }}
+              disabled={loading}
+            >
+              {loading ? <Loader2 size={16} className="spinner" style={{ animation: 'spin 1s linear infinite' }} /> : (isSignIn ? "Sign In" : "Create Account")}
+              {!loading && <ArrowRight size={16} />}
+            </button>
+          </form>
+
+          <div style={{ marginTop: 24, textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+            By continuing, you agree to our Terms of Service and Privacy Policy.
           </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', marginTop: 8, padding: '10px' }}
-            disabled={loading}
-          >
-            {loading ? <Loader2 size={16} className="spinner" style={{ animation: 'spin 1s linear infinite' }} /> : (isSignIn ? "Sign In" : "Create Account")}
-            {!loading && <ArrowRight size={16} />}
-          </button>
-        </form>
-
-        <div style={{ marginTop: 24, textAlign: 'center', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-          By continuing, you agree to our Terms of Service and Privacy Policy.
         </div>
       </div>
     </div>
