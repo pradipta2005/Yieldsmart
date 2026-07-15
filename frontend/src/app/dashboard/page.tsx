@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { apiDashboard, DashboardData } from "@/lib/api";
 import { getUser, isAuthenticated } from "@/lib/auth";
+import { getProfile } from "@/lib/profile";
 import {
   Cloud, Droplets, Wind, Eye, Thermometer, Sunrise, Sunset,
   Leaf, AlertTriangle, Droplet, Clock, CheckCircle2, XCircle,
   RefreshCw, ArrowRight, Zap, TrendingUp, Info,
-  Sun, CloudSnow, CloudLightning, CloudDrizzle, CloudFog, CloudRain
+  Sun, CloudSnow, CloudLightning, CloudDrizzle, CloudFog, CloudRain,
+  Navigation, MapPin
 } from "lucide-react";
 
 /* ─── Animated number counter ─────────────────────────────── */
@@ -96,6 +98,10 @@ function getWeatherIcon(desc: string, size: number = 24) {
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ name: string; city: string } | null>(null);
+  const [farmName, setFarmName] = useState("");
+  const [cropFocus, setCropFocus] = useState("");
+  const [locationLabel, setLocationLabel] = useState("");
+  const [isGPS, setIsGPS] = useState(false);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,29 +110,48 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isAuthenticated()) { router.replace("/"); return; }
-    const u = getUser(); setUser(u);
+    const u = getUser();
+    setUser(u);
+    const p = getProfile();
+    setFarmName(p.farmName || "");
+    setCropFocus(p.cropFocus || "");
+    if (p.locationMode === "gps" && p.locationLabel) {
+      setLocationLabel(p.locationLabel);
+      setIsGPS(true);
+    } else if (u?.city) {
+      setLocationLabel(u.city);
+      setIsGPS(false);
+    }
     const tick = setInterval(() => setTime(new Date()), 60_000);
     return () => clearInterval(tick);
   }, [router]);
 
-  const load = async (city: string) => {
+  const load = async (city: string, lat?: number | null, lon?: number | null) => {
     setLoading(true); setError(null);
-    try { setData(await apiDashboard(city)); }
+    try { setData(await apiDashboard(city, lat, lon)); }
     catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed to load"); }
     finally { setLoading(false); }
   };
 
   useEffect(() => {
     if (!user) return;
-    load(user.city);
-    const ref = setInterval(() => load(user.city), 10 * 60_000);
+    const p = getProfile();
+    const city = (p.locationMode === "gps" && p.locationLabel) ? p.locationLabel : user.city;
+    const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
+    const lon = (p.locationMode === "gps" && p.savedLon) ? p.savedLon : null;
+    load(city, lat, lon);
+    const ref = setInterval(() => load(city, lat, lon), 10 * 60_000);
     return () => clearInterval(ref);
   }, [user]);
 
   const handleRefresh = async () => {
-    if (!user || refreshing) return;
+    if (refreshing) return;
     setRefreshing(true);
-    try { setData(await apiDashboard(user.city)); }
+    const p = getProfile();
+    const city = (p.locationMode === "gps" && p.locationLabel) ? p.locationLabel : (user?.city || "");
+    const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
+    const lon = (p.locationMode === "gps" && p.savedLon) ? p.savedLon : null;
+    try { setData(await apiDashboard(city, lat, lon)); }
     finally { setRefreshing(false); }
   };
 
@@ -156,12 +181,32 @@ export default function DashboardPage() {
               <Tag label="Farm Intelligence Dashboard" />
               <h1 style={{ fontSize: "clamp(1.6rem, 4vw, 2.25rem)", fontWeight: 800, letterSpacing: "-0.04em", fontFamily: "var(--font-display)", lineHeight: 1.1, marginBottom: 8 }}>
                 {greetEmoji} {greeting},<br />
-                <span style={{ color: "var(--accent-primary)" }}>{user.name.split(" ")[0]}.</span>
+                <span style={{ color: "var(--accent-primary)" }}>
+                  {farmName ? farmName : user.name.split(" ")[0]}.
+                </span>
               </h1>
-              <p style={{ color: "var(--text-tertiary)", fontSize: "0.82rem" }}>{todayStr}</p>
+              {/* Location indicator */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                {isGPS
+                  ? <Navigation size={11} color="var(--accent-primary)" />
+                  : <MapPin size={11} color="var(--text-tertiary)" />}
+                <span style={{ fontSize: "0.78rem", color: "var(--text-tertiary)" }}>{locationLabel}</span>
+                <a href="/profile" style={{ fontSize: "0.72rem", color: "var(--accent-primary)", textDecoration: "none", marginLeft: 4, opacity: 0.8 }}>change</a>
+              </div>
+              <p style={{ color: "var(--text-tertiary)", fontSize: "0.82rem", marginTop: 4 }}>{todayStr}</p>
             </div>
 
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
+              {cropFocus && cropFocus !== "Mixed / General" && (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 6, padding: "6px 14px",
+                  borderRadius: 99, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.18)",
+                  fontSize: "0.72rem", fontWeight: 700, color: "var(--accent-primary)",
+                  letterSpacing: "0.04em", textTransform: "uppercase",
+                }}>
+                  <Leaf size={11} /> {cropFocus}
+                </div>
+              )}
               {data && (
                 <div style={{
                   display: "flex", alignItems: "center", gap: 8, padding: "8px 16px",

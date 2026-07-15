@@ -70,8 +70,13 @@ export interface DashboardData {
   alerts: FarmAlert[]; irrigation: IrrigationSched;
   forecast: ForecastDay[]; season: string;
 }
-export const apiDashboard = (city: string) =>
-  req<DashboardData>(`/api/dashboard?city=${encodeURIComponent(city)}`);
+export const apiDashboard = (city: string, lat?: number | null, lon?: number | null) => {
+  // Use GPS coordinates when available for accurate rural weather data
+  if (lat != null && lon != null) {
+    return req<DashboardData>(`/api/dashboard?lat=${lat}&lon=${lon}`);
+  }
+  return req<DashboardData>(`/api/dashboard?city=${encodeURIComponent(city)}`);
+};
 
 // ── Disease ───────────────────────────────────────────────────────────────────
 export interface Treatment { method: string; ratio: string; frequency: string; }

@@ -18,7 +18,7 @@ from auth import (
     create_user, authenticate_user, create_access_token,
     get_current_user, get_optional_user
 )
-from weather_service import get_current_weather, get_forecast
+from weather_service import get_current_weather, get_forecast, get_weather_by_coords, get_forecast_by_coords
 from soil_service import (
     estimate_soil_conditions, get_crop_recommendations,
     get_farming_alerts, get_irrigation_schedule, get_current_season
@@ -108,12 +108,23 @@ def me(current_user: dict = Depends(get_current_user)):
 
 @app.get("/api/dashboard")
 def dashboard(
-    city: str = Query(...),
+    city: str = Query(default=None),
+    lat: float = Query(default=None),
+    lon: float = Query(default=None),
     current_user: dict = Depends(get_optional_user)
 ):
-    """Full dashboard data. Auth optional — works for guests too."""
+    """Full dashboard data. Accepts city name OR lat/lon coordinates for GPS accuracy."""
+    if lat is None and lon is None and city is None:
+        raise HTTPException(status_code=400, detail="Provide either 'city' or 'lat' and 'lon'.")
     try:
-        weather  = get_current_weather(city)
+        # Use GPS coordinates when available (more accurate for rural farms)
+        if lat is not None and lon is not None:
+            weather  = get_weather_by_coords(lat, lon)
+            forecast = get_forecast_by_coords(lat, lon)
+        else:
+            weather  = get_current_weather(city)
+            forecast = get_forecast(city)
+
         temp     = weather["temp"]
         humidity = weather["humidity"]
         wind     = weather["wind_speed"]
@@ -121,11 +132,10 @@ def dashboard(
         pressure = weather["pressure"]
         clouds   = weather["clouds"]
 
-        soil      = estimate_soil_conditions(temp, humidity, pressure, clouds)
-        crops     = get_crop_recommendations(temp, humidity)
-        alerts    = get_farming_alerts(temp, humidity, wind, desc)
+        soil       = estimate_soil_conditions(temp, humidity, pressure, clouds)
+        crops      = get_crop_recommendations(temp, humidity)
+        alerts     = get_farming_alerts(temp, humidity, wind, desc)
         irrigation = get_irrigation_schedule(temp, humidity)
-        forecast  = get_forecast(city)
 
         return {
             "weather": weather, "soil": soil, "crops": crops,
