@@ -92,7 +92,10 @@ export default function DiseasePage() {
           onClose={() => setShowCamera(false)}
         />
       )}
-      <main className="app-page-container">
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className="premium-mesh-glow-1" />
+        <div className="premium-mesh-glow-2" />
+        <main className="app-page-container" style={{ position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
@@ -158,7 +161,7 @@ export default function DiseasePage() {
                   onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
               </div>
             ) : (
-              <div className="app-card" style={{ padding: 0 }}>
+              <div className="app-card premium-glass-card app-card-accent-emerald" style={{ padding: 0 }}>
                 <div style={{ position: "relative", background: "rgba(0,0,0,0.5)", maxHeight: 320, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Image src={preview} alt="Leaf" width={600} height={320}
                     style={{ width: "100%", height: 300, objectFit: "contain", display: "block" }} unoptimized />
@@ -189,7 +192,7 @@ export default function DiseasePage() {
 
             {/* Analysis steps */}
             {loading && (
-              <div className="app-card">
+              <div className="app-card premium-glass-card app-card-accent-blue">
                 <div style={{ fontWeight: 700, fontSize: "0.95rem", marginBottom: 20, display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
                   <Activity size={16} color="var(--accent-primary)" /> Analysing your leaf…
                 </div>
@@ -221,7 +224,7 @@ export default function DiseasePage() {
           {/* ── Right: Result ── */}
           {result && !loading && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div className="app-card" style={{ padding: 0, borderColor: sevColor + "30" }}>
+              <div className={`app-card premium-glass-card ${sev === "none" ? "app-card-accent-emerald" : sev === "moderate" ? "app-card-accent-yellow" : "app-card-accent-red"}`} style={{ padding: 0, borderColor: sevColor + "30" }}>
 
                 {/* Result header */}
                 <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-tertiary)" }}>
@@ -357,6 +360,7 @@ export default function DiseasePage() {
           )}
         </div>
       </main>
+    </div>
     </>
   );
 }

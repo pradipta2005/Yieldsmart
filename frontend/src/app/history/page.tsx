@@ -47,7 +47,10 @@ export default function HistoryPage() {
   return (
     <>
       <Navbar />
-      <main className="app-page-container">
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div className="premium-mesh-glow-1" />
+        <div className="premium-mesh-glow-2" />
+        <main className="app-page-container" style={{ position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
@@ -64,11 +67,11 @@ export default function HistoryPage() {
         {data && (
           <div className="history-stats-grid">
             {[
-              { icon: <ScanSearch size={20} />, label: "Total Scans", val: data.stats.total_scans, color: "var(--text-primary)", bg: "var(--bg-secondary)", border: "var(--border-subtle)" },
-              { icon: <AlertCircle size={20} />, label: "Diseases Found", val: data.stats.diseases_found, color: "var(--warning)", bg: "var(--warning-bg)", border: "rgba(245,158,11,0.15)" },
-              { icon: <CheckCircle2 size={20} />, label: "Healthy Plants", val: data.stats.healthy, color: "var(--success)", bg: "var(--success-bg)", border: "rgba(16,185,129,0.15)" },
+              { icon: <ScanSearch size={20} />, label: "Total Scans", val: data.stats.total_scans, color: "var(--text-primary)", accentClass: "app-card-accent-blue" },
+              { icon: <AlertCircle size={20} />, label: "Diseases Found", val: data.stats.diseases_found, color: "var(--warning)", accentClass: "app-card-accent-yellow" },
+              { icon: <CheckCircle2 size={20} />, label: "Healthy Plants", val: data.stats.healthy, color: "var(--success)", accentClass: "app-card-accent-emerald" },
             ].map((s, i) => (
-              <div key={i} className="app-card" style={{ background: s.bg, borderColor: s.border }}>
+              <div key={i} className={`app-card premium-glass-card ${s.accentClass}`}>
                 <div style={{ color: s.color, marginBottom: 16, opacity: 0.7 }}>{s.icon}</div>
                 <div style={{ fontSize: "2rem", fontWeight: 600, color: s.color, lineHeight: 1, fontFamily: "var(--font-mono)", marginBottom: 6 }}>{s.val}</div>
                 <div style={{ fontSize: "0.78rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-tertiary)" }}>{s.label}</div>
@@ -100,7 +103,7 @@ export default function HistoryPage() {
         {/* History list */}
         {!loading && data && (
           data.history.length > 0 ? (
-            <div className="app-card" style={{ padding: 0 }}>
+            <div className="app-card premium-glass-card app-card-accent-emerald" style={{ padding: 0 }}>
               <div style={{ padding: "18px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontWeight: 700, fontSize: "0.95rem", fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>Recent Scans</span>
                 <span style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", padding: "3px 10px", borderRadius: 99, background: "var(--bg-tertiary)", color: "var(--text-secondary)", border: "1px solid var(--border-subtle)" }}>
@@ -170,6 +173,7 @@ export default function HistoryPage() {
           )
         )}
       </main>
+    </div>
 
       {/* ── Scan Detail Modal ── */}
       {selectedScan && (() => {
