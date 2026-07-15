@@ -165,7 +165,9 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     const p = getProfile();
-    const city = (p.locationMode === "gps" && p.locationLabel)
+    // For GPS mode, use user.city (valid city) as backend fallback to avoid OWM lookup errors
+    // For manual mode, use the farmer's typed location
+    const city = (p.locationMode === "manual" && p.locationLabel)
       ? p.locationLabel.split(",")[0].trim()
       : user.city;
     const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
@@ -179,7 +181,7 @@ export default function DashboardPage() {
     if (refreshing) return;
     setRefreshing(true);
     const p = getProfile();
-    const city = (p.locationMode === "gps" && p.locationLabel)
+    const city = (p.locationMode === "manual" && p.locationLabel)
       ? p.locationLabel.split(",")[0].trim()
       : (user?.city || "");
     const lat = (p.locationMode === "gps" && p.savedLat) ? p.savedLat : null;
