@@ -9,6 +9,9 @@ const withPWA = require("next-pwa")({
 });
 
 const nextConfig: NextConfig = {
+  // Satisfy Next.js 16 Turbopack requirement — next-pwa adds a webpack config,
+  // so we must also declare a turbopack config (even if empty) to silence the error.
+  turbopack: {},
   images: {
     // Allow blob URLs for image preview (local object URLs)
     dangerouslyAllowSVG: true,
